@@ -17,6 +17,7 @@ sys.path.append(ROOT_PATH)
 import numpy as np
 # import tensorflow as tf
 from collections import defaultdict
+from sklearn.model_selection import train_test_split
 
 
 class DataHelper(object):
@@ -28,8 +29,7 @@ class DataHelper(object):
         self.startline = startline
         self.token2idx = dict()
 
-    @staticmethod
-    def load_data(fpath, fields=[], seg_label='\t', startline=0):
+    def load_data(self, fields=[], seg_label='\t', startline=0):
         """
         get data from `fpath`.
         @fpath:
@@ -37,7 +37,7 @@ class DataHelper(object):
         return data_list: type dict(list)
         """
         data_list = defaultdict(list)
-        with open(fpath, 'r') as f:
+        with open(self.fpath, 'r') as f:
             for li, line in enumerate(f):
                 if li<startline:
                     continue
@@ -51,51 +51,85 @@ class DataHelper(object):
 
         return data_list
                     
-    @staticmethod
-    def load_vocab(vocab_path):
+    def load_vocab(self):
         """
 
         """
-        vocab = [line.strip() for line in open(vocab_path, 'r').readlines()]
+        vocab = [line.strip() for line in open(self.vocab_path, 'r').readlines()]
         token2idx = {token:idx for idx, token in enumerate(vocab)}
         idx2token = {idx:token for idx, token in enumerate(vocab)}
 
         return token2idx, idx2token 
 
-    def get_data(self, id_fields=["x"], padding=True, maxlen=None):
+    def get_data(self, id_fields=["x"]):
         """
         fit `x:label` data, like classify task.
         
         return data_list
         """
-        self.data_list = self.load_data(self.fpath, 
-                                   fields   =self.fields, 
-                                   seg_label=self.seg_label, 
-                                   startline=self.startline)
-        self.token2idx, self.idx2token = self.load_vocab(vocab_path) 
+        self.data_list = self.load_data(fields   =self.fields, 
+                                       seg_label=self.seg_label, 
+                                       startline=self.startline)
+        self.token2idx, self.idx2token = self.load_vocab() 
+        
         for field in id_fields:
             assert field in self.data_list, ("{0} not in data_list".format(field))
             data = self.data_list[field]
-            if padding and maxlen is None:
-                maxlen = max([len(d) for d in data])
             idlist = []
             for text in data:
-                # `padding:0, UNK:1`
                 l = [int(self.token2idx.get(t, "1")) for t in text]
-                if padding and len(l)<maxlen:
-                    l += [0] * (maxlen-len(l))
                 idlist.append(l)
             self.data_list[field] = idlist
 
         return self.data_list
 
-    def batch_iter(data, batch_size, num_epoches, shuffle=True):
-        """
-        gengrate a batch iterator for dataset.
-        """
-        data = np.array(data)
-        data_size = len(data)
-        num_batches_pre_epoch = int(data_size-1) / batch_size + 1
+def padding(data, maxlen=None):
+    if maxlen is None:
+        maxlen = max([len(d) for d in data])
+
+    idlist = []
+    for l in data:
+        if len(l)<maxlen:
+            # `padding:0, UNK:1`
+            l += [0] * (maxlen-len(l))
+        idlist.append(l)
+
+    return (idlist, maxlen)
+
+def train_test_data_split(data, shuffle=True, test_size=0.2):
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, shuffle=shuffle)
+
+    return (x_train, x_test, y_train, y_test)
+
+def train_dev_test_data_split(data, shuffle=True, dev_size=0.1, test_size=0.2):
+    _x_data = [d[0] for d in data]
+    _y_data = [d[1] for d in data]
+    if shuffle:
+        np.random.seed(10)
+        shuffle_indices = np.random.permutation(np.arange(len(_y_data)))
+        x_shuffled = _x_data[shuffle_indices]
+        y_shuffled = _y_data[shuffle_indices]
+    x_data = x_shuffled if shuffle else _x_data
+    y_data = y_shuffled if shuffle else _y_data
+
+    train_size = 1.0 - (dev_size + test_size)
+    dev_sample_index = int(train_size * float(len(_y_data)))
+    test_sample_index= int((train_size + dev_size) * float(len(_y_data)))
+    x_train, x_dev, x_test = x_data[:dev_sample_index], x_data[dev_sample_index:test_sample_index], x_data[test_sample_index:]
+    y_train, y_dev, y_test = y_data[:dev_sample_index], y_data[dev_sample_index:test_sample_index], y_data[test_sample_index:]
+
+    del x_data, y_data, _x_data, _y_data
+
+    return (x_train, y_train, x_dev, y_dev, x_test, y_test)
+
+def batch_iter(data, batch_size, num_epoches, shuffle=True):
+    """
+    gengrate a batch iterator for dataset.
+    """
+    data = np.array(data)
+    data_size = len(data)
+    num_batches_pre_epoch = int(data_size-1) / batch_size + 1
+
 
 
 if __name__ == "__main__":
