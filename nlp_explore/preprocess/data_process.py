@@ -10,14 +10,33 @@
 #
 #================================================================
 
+import codecs
 from collections import defaultdict
 from collections import Counter
 
 class DataProcessor(object):
-    def __init__(self):
-        # self.path = path
+    def __init__(self, fpath):
+        self.fpath = fpath
         self.text2id = dict()
         self.index2word = dict()
+
+    def load_data(self, fields=None, seg_label='\t'):
+        """
+        load data from dataset. 
+        @param: `fields` means chose which index fields to process, type [index list];
+        @param: `seg_label`
+        """
+        content = ""
+        with open(self.fpath, 'r') as rf:
+            for line in rf:
+                if not fields:
+                    content += line.strip()
+                    continue
+                items = line.strip().split(seg_label)
+                get_items = [items[i] for i in fields]
+                content += ''.join(get_items)
+        return content
+
 
     @staticmethod
     def build_dict(content, max_length=None, min_freq=1, keep_back=None):
@@ -45,11 +64,13 @@ class DataProcessor(object):
         if keep_back and keep_back<len(word_count)-1:
             word_count = word_count[:len(word_count)-1]
 
-        vocab_dict={"<PAD>":0, "<UNK>":1}
+        # vocab_dict={"<PAD>":0, "<UNK>":1}
+        vocab = ["<PAD>", "<UNK>"]
         for w,c in word_count:
-            vocab_dict[w] = len(vocab_dict)
+            # vocab_dict[w] = len(vocab_dict)
+            vocab.append(w)
 
-        return vocab_dict
+        return vocab
 
     @staticmethod
     def gen_text2id(text, vocab_dict, padding=False, max_len=None):
@@ -66,14 +87,17 @@ class DataProcessor(object):
 
 
 if __name__ == "__main__":
-    processor = DataProcessor()
-    content = "这些方法是在一个固定的图上直接学习每个节点embedding，但是大多情况图是会演化的，当网络结构改变以及新节点的出现，直推式学习需要重新训练（复杂度高且可能会导致embedding会偏移），很难落地在需要快速生成未知节点embedding的机器学习系统上。"
-    vocab = processor.build_dict(content)
-    text = "我要听的歌"
-    print(vocab)
-    print("********"*10)
-    text2id = processor.gen_text2id(text, vocab, padding=True, max_len=10)
-    print(text2id)
+    # with open('../data/classify/data.csv') as rf:
+    #     content = ""
+    #     for line in rf:
+    #         content += line.strip().split('\t')[-1]
+    fpath = '../data/classify/data.csv'
+    processor = DataProcessor(fpath)
+    content = processor.load_data(fields=[1])
+    vocab = processor.build_dict(content, min_freq=2)
+    print(len(vocab))
+    with codecs.open('./vocab.txt', 'w', 'utf8') as wf:
+        wf.write('\n'.join(vocab))
 
 
 
