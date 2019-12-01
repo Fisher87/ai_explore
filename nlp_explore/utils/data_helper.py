@@ -122,15 +122,23 @@ def train_dev_test_data_split(data, shuffle=True, dev_size=0.1, test_size=0.2):
 
     return (x_train, y_train, x_dev, y_dev, x_test, y_test)
 
-def batch_iter(data, batch_size, num_epoches, shuffle=True):
+def batch_iter(data,batch_size,num_epochs,shuffle=True):
     """
     gengrate a batch iterator for dataset.
     """
-    data = np.array(data)
-    data_size = len(data)
-    num_batches_pre_epoch = int(data_size-1) / batch_size + 1
-
-
+    data=np.array(data)
+    data_size=len(data)
+    num_batches_per_epoch=int((data_size-1)/batch_size)+1
+    for epoch in range(num_epochs):
+        if shuffle:
+            shuffle_indices=np.random.permutation(np.arange(data_size))
+            shuffled_data=data[shuffle_indices]
+    else:
+        shuffled_data=data
+    for batch_num in range(num_batches_per_epoch):
+        start_index=batch_num*batch_size
+        end_index=min(batch_size*(batch_num+1), data_size)
+        yield shuffled_data[start_index:end_index]
 
 if __name__ == "__main__":
     fpath = "../data/classify/data.csv"
