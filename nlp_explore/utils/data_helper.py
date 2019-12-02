@@ -92,11 +92,13 @@ def padding(data, maxlen=None):
         if len(l)<maxlen:
             # `padding:0, UNK:1`
             l += [0] * (maxlen-len(l))
+        else:
+            l = l[:maxlen]
         idlist.append(l)
 
     return (idlist, maxlen)
 
-def train_test_data_split(data, shuffle=True, test_size=0.2):
+def train_test_data_split(x, y, shuffle=True, test_size=0.2):
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, shuffle=shuffle)
 
     return (x_train, x_test, y_train, y_test)
@@ -140,9 +142,28 @@ def batch_iter(data,batch_size,num_epochs,shuffle=True):
         end_index=min(batch_size*(batch_num+1), data_size)
         yield shuffled_data[start_index:end_index]
 
+def one_hot_encode(x):
+    """
+    convert array/list of indices to 1-hot encoded numpy/list;
+    e.g. 
+    >>> a = [1, 0, 3]
+    >>> b = one_hot_encode(a)
+    >>> b
+        [[0, 1, 0, 0],
+         [1, 0, 0, 0],
+         [0, 0, 0, 1]]
+    """
+    array_x = np.array(x)
+    b = np.zeros((array_x.size, array_x.max()+1))
+    b[np.arange(array_x.size), array_x] = 1
+    return b.tolist()
+
 if __name__ == "__main__":
-    fpath = "../data/classify/data.csv"
-    vocab_path = "../data/vocab.txt"
-    data_helper = DataHelper(fpath, vocab_path, fields=["y", "x"], startline=1)
-    data_list = data_helper.get_data(padding=False)
-    print(data_list["x"][:10])
+    # fpath = "../data/classify/data.csv"
+    # vocab_path = "../data/vocab.txt"
+    # data_helper = DataHelper(fpath, vocab_path, fields=["y", "x"], startline=1)
+    # data_list = data_helper.get_data(padding=False)
+    # print(data_list["x"][:10])
+    a = [1, 0, 3]
+    b = one_hot_encode(a)
+    print(b)

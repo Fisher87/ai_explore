@@ -20,6 +20,7 @@ class TextCNN(object):
                  embedding_size,
                  learning_rate, 
                  filter_sizes,
+                 num_filters,
                  random_embedding = True,
                  l2_lambda = 0.0005
                 ):
@@ -27,14 +28,21 @@ class TextCNN(object):
 
         """
         # placeholders for input, output and dropout
-        self.input_x = tf.placeholder(tf.int32, [None, sequence_length], name="input_x")
-        self.input_y = tf.placeholder(tf.float32, [None, num_classes], name="input_y")
-        self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
+        self.input_x = tf.compat.v1.placeholder(tf.int32, [None, sequence_length], name="input_x")
+        self.input_y = tf.compat.v1.placeholder(tf.float32, [None, num_classes], name="input_y")
+        self.dropout_keep_prob = tf.compat.v1.placeholder(tf.float32, name="dropout_keep_prob")
+
+        # l2 regularization loss
+        l2_loss = tf.constant(0.0)
+        if isinstance(filter_sizes, list):
+            self.filter_sizes = filter_sizes
+        else:
+            self.filter_sizes = [int(_) for _ in filter_sizes.strip().split(',')]
 
         # embedding layer
         with tf.device('/cpu:0'), tf.name_scope("embedding"):
             if random_embedding:
-                self.embedding_table = tf.Variable(tf.random_uniform([vocab_size, embedding_size], -1.0, 1.0), 
+                self.embedding_table = tf.Variable(tf.random.uniform([vocab_size, embedding_size], -1.0, 1.0), 
                                      name="W")
                 self.embedding = tf.nn.embedding_lookup(self.embedding_table, self.input_x)
 
@@ -43,17 +51,20 @@ class TextCNN(object):
                 self.embedding_table = load_embedding()
                 self.embedding = tf.nn.embedding_lookup(self.embedding_table, self.input_x)
 
+            # tf.nn.conv2d input shape must rank 4;
+            self.embedding_expanded = tf.expand_dims(self.embedding, -1)
+
         # create conv and maxpool layer for each filter
         pooled_outputs = []
-        for filter_size in filter_sizes:
+        for filter_size in self.filter_sizes:
             with tf.name_scope("conv-layer-%s" %filter_size):
                 filter_shape = [filter_size, embedding_size, 1, num_filters]
-                W = tf.Variable(tf.truncated_normal(filter_shape, stddev=0.1), name="W")
-                b = tf.Variable(tf.truncated_normal([num_filters]), name="b")
-                conv = tf.nn.relu(tf.nn.conv2d(self.embedding, W, strides=[1,1,1,1], padding="VALID")+b, name="conv")
+                W = tf.Variable(tf.random.truncated_normal(filter_shape, stddev=0.1), name="W")
+                b = tf.Variable(tf.random.truncated_normal([num_filters]), name="b")
+                conv = tf.nn.relu(tf.nn.conv2d(self.embedding_expanded, W, strides=[1,1,1,1], padding="VALID")+b, name="conv")
 
                 # max pool 
-                pooled = tf.nn.max_pool(
+                pooled = tf.nn.max_pool2d(
                     conv, ksize=[1, sequence_length-filter_size+1, 1, 1],
                     strides=[1, 1, 1, 1],
                     padding="VALID",
@@ -62,7 +73,7 @@ class TextCNN(object):
                 pooled_outputs.append(pooled)
 
         # concat all pooled features
-        num_filters_total = num_filters * len(filter_size)
+        num_filters_total = num_filters * len(self.filter_sizes)
         h_pool = tf.concat(pooled_outputs, 3)
         h_pool_flat = tf.reshape(h_pool, [-1, num_filters_total])
 
@@ -72,10 +83,10 @@ class TextCNN(object):
 
         # fnn, score and prediction
         with tf.name_scope("output"):
-            w = tf.get_variable("w", shape=[num_filters_total, num_classes], 
+            w = tf.compat.v1.get_variable("w", shape=[num_filters_total, num_classes], 
                                 initializer=tf.contrib.layers.xavier_initializer())
             b = tf.Variable(tf.truncated_normal([num_classes]), name="b")
-            l2_loss += tf.nn.l2_loss(w)
+            l2_loss = tf.nn.l2_loss(w)
             l2_loss += tf.nn.l2_loss(b)
             self.logits = tf.matmul(self.h_dropout, w) + b # self.scores = tf.nn.xw_plus_b(self.h_dropout, w, b, name="logits")
             self.predictions = tf.argmax(self.logits, 1, name="prediction")
