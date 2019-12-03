@@ -24,7 +24,9 @@ class ESIM(object):
         self.hidden_size = 
 
         self.p = tf.placeholder(tf.int32, [None, seq_length], name="premise")
+        self.p_mask = tf.cast(tf.math.equal(self.p, 0), tf.float32)
         self.h = tf.placeholder(tf.int32, [None, seq_length], name="hypothesis")
+        self.h_mask = tf.cast(tf.math.equal(self.h, 0), tf.float32)
         self.y = tf.placeholder(tf.int32, [None], name="y")
 
         # real length
@@ -49,12 +51,32 @@ class ESIM(object):
         (h_f, h_b), _ = encoding(self.embedding_h, self.h_len, reuse=tf.AUTO_REUSE, scope_name="lstm_h")
 
         p = self.dropout(tf.concat([p_f, p_b], axis=2))  # [batch_size, max_time, hidden_size*2]
-        h = self.dropout(tf.concat([h_f, h_b], axis=2))
+        h = self.dropout(tf.concat([h_f, h_b], axis=2))  # [batch_size, max_time, hidden_size*2]
 
         # local inference modeling layer
         with tf.name_scope("local_inference_modeling"):
             # e_ij = a_i.T * b_j
-            pass
+            e = tf.matmul(p, tf.transpose(h, [0, 2, 1])) # [batch_size, max_time(p), max_time(h)]
+
+            # NOTE:compute attention need using mask;
+            # refer:https://github.com/terrifyzhao/text_matching/commit/002758625b16366fc4985c8dd6fddfb4ccfcf9ff
+            # tf.nn.softmax :default axis=-1
+            #      a_attention_i = \sum_{j=1}^{len(h_j)}( exp(e_ij) / \sum_{k=1}^{len(h_j)(exp(e_ik)) * h_j} )
+            #      b_attention_j = \sum_{i=1}^{len(p_i)}( exp(e_ij) / \sum_{k=1}^{len(p_i)(exp(e_kj)) * p_i} )
+            a_attention = tf.nn.softmax(e + tf.tile(tf.expand_dims(self.h_mask*(-2**32 + 1),1), [1, tf.shape(e)[1],1]))
+            b_attention = tf.nn.softmax(tf.transpose(e, perm=[0, 2, 1]) + 
+                                         tf.tile(tf.expand_dims(self.p_mask*(-2**32 + 1),1), [1, tf.shape(tf.transpose(e, perm=[0, 2, 1]))[1],1]))
+            a = tf.matmul(a_attention, h)
+            b = tf.matmul(b_attention, p)
+
+            # 对encoding值与加权encoding值进行差异值计算(对位相减与对位相乘)，并进行拼接
+            m_a = tf.concat([a, p, a-p, tf.multiply(a, p)], axis=2)
+            m_b = tf.concat([b, h, b-h, tf.multiply(b, h)], axis=2)
+
+        # inference composition, use same LSTM layer
+        (a_f, a_b), _ = encoding(m_a, self.p_len, reuse=tf.AUTO_REUSE, scope_name="lstm_infer")
+        (b_f, b_b), _ = encoding(m_b, self.h_len, reuse=tf.AUTO_REUSE, scope_name="lstm_infer")
+
 
     def dropout(self, x):
         return tf.nn.dropout(x, keep_prob=self.keep_prob)
