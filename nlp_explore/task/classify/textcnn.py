@@ -44,12 +44,11 @@ class TextCNN(object):
             if random_embedding:
                 self.embedding_table = tf.Variable(tf.random.uniform([vocab_size, embedding_size], -1.0, 1.0), 
                                      name="W")
-                self.embedding = tf.nn.embedding_lookup(self.embedding_table, self.input_x)
-
             else:
                 # TODO
                 self.embedding_table = load_embedding()
-                self.embedding = tf.nn.embedding_lookup(self.embedding_table, self.input_x)
+
+            self.embedding = tf.nn.embedding_lookup(self.embedding_table, self.input_x)
 
             # tf.nn.conv2d input shape must rank 4;
             self.embedding_expanded = tf.expand_dims(self.embedding, -1)
