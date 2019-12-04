@@ -21,16 +21,26 @@ class DSSM(object):
                        random_embedding=True
                        hidden_units = 128,
                        learning_rate=0.001):
-        self.query = tf.placeholder(dtype=tf.int32, shape=[None, sequence_length], name="query")
-        self.doc = tf.placeholder(dtype=tf.int32, shape=[None, sequence_length], name="doc")
+        self.sequence_length = sequence_length
+        self.vocab_size = vocab_size
+        self.class_size = class_size
+        self.embedding_dim = embedding_dim
+        self.random_embedding = random_embedding
+        self.hidden_units = hidden_units
+        self.learning_rate = learning_rate
+
+    def __call__(self):
+        self.query = tf.placeholder(dtype=tf.int32, shape=[None, self.sequence_length], name="query")
+        self.doc = tf.placeholder(dtype=tf.int32, shape=[None, self.sequence_length], name="doc")
         self.y = tf.placeholder(dtype=tf.int32, shape=[None], name="y")
 
         self.keep_prob = tf.placeholder(dype=tf.float32, name="keep_prob")
         
         # embedding layer
         with tf.device('/cpu:0'), tf.name_scope("embedding"):
-            if random_embedding:
-                self.embedding_table = tf.get_variable(name="embedding", dtype=tf.float32, shape=[vocab_size, embedding_dim])
+            if self.random_embedding:
+                self.embedding_table = tf.get_variable(name="embedding", dtype=tf.float32, 
+                                                       shape=[self.vocab_size, self.embedding_dim])
             else:
                 # TODO
                 self.embedding_table = load_embedding()
@@ -50,9 +60,9 @@ class DSSM(object):
             # numclasses is 2.
         with tf.name_scope("output"):
             self.logits = tf.concat([pos_result, neg_result], axis=1)
-            y = tf.one_hot(self.y, class_size)
-            self.loss = tf.nn.softmax_cross_entropy_with_logits(labels=y, logits=self.logits)
-            self.train_op = tf.train.AdamOptimizer(learning_rate).minimize(self.loss)
+            y = tf.one_hot(self.y, self.class_size)
+            self.loss = tf.nn.softmax_cross_entropy_with_logits(labels=self.y, logits=self.logits)
+            self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
             self.predictions = tf.argmax(self.logits, axis=1)
             self.correct_pred = tf.equal(tf.cast(predictions, tf.int32), self.y)
             self.acc = tf.reduce_mean(tf.cast(correct_pred, tf.float32))

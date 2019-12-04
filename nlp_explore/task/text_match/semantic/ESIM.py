@@ -21,11 +21,34 @@ class ESIM(object):
                  hidden_size,
                  learning_rate=0.001,
                  random_embedding=True):
-        self.hidden_size = 
+        self.seq_length = seq_length
+        self.num_classes = num_classes
+        self.embedding_dim = embedding_dim
+        self.vocab_size = vocab_size
+        self.hidden_size = hidden_size 
+        self.learning_rate = learning_rate
+        self.random_embedding = random_embedding
 
-        self.p = tf.placeholder(tf.int32, [None, seq_length], name="premise")
+    def encoding(self, x, seq_len=None, reuse=False, scope_name="encoding"):
+        with tf.variable_scope(scope_name, reuse=reuse)
+            cell_fw = tf.nn.rnn_cell.BasicLSTMCell(self.hidden_size)
+            fw_lstm_cell = tf.contrib.rnn.DropoutWrapper(cell_fw, output_keep_prob=self.keep_prob)
+            cell_bw = tf.nn.rnn_cell.BasicLSTMCell(self.hidden_size)
+            bw_lstm_cell = tf.contrib.rnn.DropoutWrapper(cell_bw, output_keep_prob=self.keep_prob)
+
+            return tf.nn.bidirectional_dynamic_rnn(fw_lstm_cell, 
+                                                   bw_lstm_cell, 
+                                                   x, 
+                                                   sequence_length=seq_len,
+                                                   dtype=tf.float32)
+
+    def dropout(self, x):
+        return tf.nn.dropout(x, keep_prob=self.keep_prob)
+        
+    def __call__(self):
+        self.p = tf.placeholder(tf.int32, [None, self.seq_length], name="premise")
         self.p_mask = tf.cast(tf.math.equal(self.p, 0), tf.float32)
-        self.h = tf.placeholder(tf.int32, [None, seq_length], name="hypothesis")
+        self.h = tf.placeholder(tf.int32, [None, self.seq_length], name="hypothesis")
         self.h_mask = tf.cast(tf.math.equal(self.h, 0), tf.float32)
         self.y = tf.placeholder(tf.int32, [None], name="y")
 
@@ -36,9 +59,10 @@ class ESIM(object):
         self.keep_prob = tf.placeholder(tf.float32, name='keep_prob')
 
         # embedding layer
-        with tf.device("/cpu:0"), tf.name_scope("embedding"):
-            if random_embedding:
-                self.embedding_table = tf.get_variable(name="embedding", dtype=tf.float32, shape=[vocab_size, embedding_dim])
+        with tf.device("/cpu:0"), tf.name_scope("embedding_layer"):
+            if self.random_embedding:
+                self.embedding_table = tf.get_variable(name="embedding", dtype=tf.float32, 
+                                                       shape=[self.vocab_size, self.embedding_dim])
             else:
                 # TODO
                 self.embedding_table = load_embedding()
@@ -65,7 +89,9 @@ class ESIM(object):
             #      b_attention_j = \sum_{i=1}^{len(p_i)}( exp(e_ij) / \sum_{k=1}^{len(p_i)(exp(e_kj)) * p_i} )
             a_attention = tf.nn.softmax(e + tf.tile(tf.expand_dims(self.h_mask*(-2**32 + 1),1), [1, tf.shape(e)[1],1]))
             b_attention = tf.nn.softmax(tf.transpose(e, perm=[0, 2, 1]) + 
-                                         tf.tile(tf.expand_dims(self.p_mask*(-2**32 + 1),1), [1, tf.shape(tf.transpose(e, perm=[0, 2, 1]))[1],1]))
+                                             tf.tile(tf.expand_dims(self.p_mask*(-2**32 + 1),1), 
+                                                     [1, tf.shape(tf.transpose(e, perm=[0, 2, 1]))[1],1])
+                                       )
             a = tf.matmul(a_attention, h)
             b = tf.matmul(b_attention, p)
 
@@ -77,20 +103,29 @@ class ESIM(object):
         (a_f, a_b), _ = encoding(m_a, self.p_len, reuse=tf.AUTO_REUSE, scope_name="lstm_infer")
         (b_f, b_b), _ = encoding(m_b, self.h_len, reuse=tf.AUTO_REUSE, scope_name="lstm_infer")
 
+        a = tf.concat([a_f, a_b], axis=2)
+        b = tf.concat([b_f, b_b], axis=2)
 
-    def dropout(self, x):
-        return tf.nn.dropout(x, keep_prob=self.keep_prob)
+        a = self.dropout(a)
+        b = self.dropout(b)
 
-    def encoding(self, x, seq_len=None, reuse=False, scope_name="encoding"):
-        with tf.variable_scope(scope_name, reuse=reuse)
-            cell_fw = tf.nn.rnn_cell.BasicLSTMCell(self.hidden_size)
-            fw_lstm_cell = tf.contrib.rnn.DropoutWrapper(cell_fw, output_keep_prob=self.keep_prob)
-            cell_bw = tf.nn.rnn_cell.BasicLSTMCell(self.hidden_size)
-            bw_lstm_cell = tf.contrib.rnn.DropoutWrapper(cell_bw, output_keep_prob=self.keep_prob)
+        a_avg = tf.reduce_mean(a, axis=2)
+        b_avg = tf.reduce_mean(b, axis=2)
 
-            return tf.nn.bidirectional_dynamic_rnn(fw_lstm_cell, 
-                                                   bw_lstm_cell, 
-                                                   x, 
-                                                   sequence_length=seq_len,
-                                                   dtype=tf.float32)
+        a_max = tf.reduce_max(a, axis=2)
+        b_max = tf.reduce_max(b, axis=2)
+
+        v = tf.concat([a_avg, a_max, b_avg, b_max], axis=1)
+
+        # prediction layer
+        v = tf.layers.dense(v, 512, activation="tanh")
+        v = self.dropout(v)
+        self.logits = tf.layers.dense(v, self.num_classes, activation="tanh")
+        self.prob = tf.nn.softmax(self.logits)
+        self.prediction = tf.argmax(self.logits, axis=1)
+        loss = tf.nn.softmax_cross_entropy_with_logits(labels=self.y, logits=self.logits)
+        self.loss = tf.reduce_mean(loss, axis=0)
+        self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
+        correct_prediction = tf.equal(tf.cast(self.prediction, tf.int32), self.y)
+        self.acc = tf.reduce_mean(tf.cast(correct_prediction, tf.float32), axis=0)
 
