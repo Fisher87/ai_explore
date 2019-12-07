@@ -60,6 +60,12 @@ class ConvNet(object):
             with tf.name_scope("%s-%s" % (scope_name_prefix, filter_size)):
                 filter_w = tf.Variable(tf.truncated_normal(filter_shape, stddev=0.1), name="filter_w")
                 filter_b = tf.Variable(tf.constant(0.1, shape=[self.filter_num]), name="filter_b")
+
+                # tf.nn.conv2d(input,:     [batch, in_height, in_width, in_channels]
+                #              filters,:   [filter_height, filter_width, in_channels, out_channels]
+                #              strides,
+                #              padding
+                #              )
                 conv = tf.nn.conv2d(x, 
                                     filter_w, 
                                     strides=[1, 1, 1, 1],
