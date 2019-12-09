@@ -17,22 +17,30 @@ class ABCnn(object):
     def __init__(self, seq_length,
                 vocab_size,
                 embedding_dim,
-                filter_sizes,
                 filter_num,
+                filter_size=3,
                 learning_rate=0.001,
                 keep_prob = 0.5,
+                cnn1_filters = 256,
+                cnn2_filters = 128,
                 random_embedding=True,
                 num_classes=2,
-                abcnn_1=False):
+                abcnn_1 = False,
+                abcnn_2 = False,
+                ):
         self.seq_length = seq_length
         self.vocab_size = vocab_size
         self.embedding_dim = embedding_dim
-        self.filter_sizes = filter_sizes
+        self.filter_size = filter_size
         self.filter_num = filter_num
         self.learning_rate = learning_rate
         self.keep_prob = keep_prob
+        self.cnn1_filters = cnn1_filters
+        self.cnn2_filters = cnn2_filters
         self.random_embedding = random_embedding
         self.num_classes = num_classes
+        self.abcnn_1 = abcnn_1
+        self.abcnn_2 = abcnn_2
 
     def _conv(self, x, namescope="conv"):
         kernel = tf.get_variable("kernel", shape=[self.filter_size, self.embedding_dim, x.get_shape()[2], self.embedding_dim],
@@ -111,24 +119,74 @@ class ABCnn(object):
             filter_shape = [self.filter_size, self.embedding_dim]
             p = tf.layers.conv2d(p_embedding, 
                                  filters=self.cnn1_filters,
-                                 kernel_size =filter_shape)
+                                 kernel_size =filter_shape)        # [batchsize, lp+1-filter_width, 1, cnn1_filters]
             h = tf.layers.conv2d(h_embedding, 
                                  filters=self.cnn1_filters,
-                                 kernel_size =filter_shape)
+                                 kernel_size =filter_shape)        # [batchsize, lh+1-filter_width, 1, cnn1_filters]
             # p = self._conv(p_embedding)
             # h = self._conv(h_embedding)
             p = self.dropout(p)
             h = self.dropout(h)
 
-        if self.abcnn2:
-            pass
+        # convolution layer-1
+        # maxpooling layer
+        # 原论文中有两层宽卷积操作
+
+        # abcnn-2&abcnn-3 add attention layer for conv layer
+        if self.abcnn_2:
+            attention_pool_edulidean = tf.sqrt(
+                tf.reduce_mean(
+                    tf.square(tf.transpose(p, perm=[0,3,1,2]) - tf.transpose(h, perm=[0,3,2,1])),
+                    , axis=-1))
+            attention_pool_matrix = 1 / (attention_pool_edulidean + 1)   # [batchsize, lp+1-filter_width, lh-1+filter_width]
+
+            # col-wise sum
+            p_sum = tf.reduce_sum(attention_pool_matrix, axis=2, keep_dims=True)         # [batchsize, lp+1-filter_width, 1]
+            # row-wise sum
+            h_sum = tf.reduce_sum(attention_pool_matrix, axis=1, keep_dims=True)         # [batchsize, 1, lh+1-filter_width]
+
+            p = tf.reshape(p, shape=[-1, p.shape[1], p.shape[2]*p.shape[3]])        # [batchsize, lp+1-filter_width, cnn1_filters] 
+            h = tf.reshape(h, shape=[-1, h.shape[1], h.shape[2]*h.shape[3]])        # [batchsize, lh+1-filter_width, cnn1_filters]
+
+            p = tf.multiply(p, p_sum)   # [batchsize, lp+1-filter_width, cnn1_filters]
+            h = tf.multiply(h, h_sum)   # [batchsize, lh+1-filter_width, cnn1_filters]
         else:
-            p = tf.reshape(p, shape=[-1, p.shape[1], p.shape[2]*p.shape[3]])
-            h = tf.reshape(h, shape=[-1, h.shape[1], h.shape[2]*h.shape[3]])
+            p = tf.reshape(p, shape=[-1, p.shape[1], p.shape[2]*p.shape[3]])   # [batchsize, lp+1-filter_width, cnn1_filters] 
+            h = tf.reshape(h, shape=[-1, h.shape[1], h.shape[2]*h.shape[3]])   # [batchsize, lh+1-filter_width, cnn1_filters]
 
         p = tf.expand_dims(p, axis=-1)
         h = tf.expand_dims(h, axis=-1)
 
-        # max pooling
-        p_all = 
+        with tf.name_scope("conv-layer2"):
+            filter_shape = [self.filter_size, self.cnn1_filters]
+            p = tf.layers.conv2d(p, 
+                                 filters=self.cnn2_filters,
+                                 kernel_size = filter_shape)
+            h = tf.layers.conv2d(h, 
+                                 filters=self.cnn2_filters,
+                                 kernel_size = filter_shape)
+            p = self.dropout(p) 
+            h = self.dropout(h)
+
+        # max pooling all, through word direction[dim=1].
+        p_all = tf.reduce_mean(p, axis=1)   # [batchsize, 1, cnn2_filters] 
+        h_all = tf.reduce_mean(h, axis=1)   # [batchsize, 1, cnn2_filters]
+
+        all_embedding = tf.concat([p_all, h_all], axis=-1)
+        shape = all_embedding.shape
+        all_embedding = tf.reshape(all_embedding, [-1, shape[1]*shape[2]])
+
+        # fc layer
+        out = tf.layers.dense(all_embedding, 50)
+        self.logits = tf.layers.dense(out, self.num_classes)
+
+        # train opt
+        with tf.name_scope("train-opt"):
+            y = tf.one_hot(self.y, self.num_classes)
+            loss = tf.nn.softmax_entropy_with_logits(logits=self.logits, labels=y)
+            self.loss = tf.reduce_mean(loss, axis=0)
+            self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
+            self.predictions = tf.argmax(self.logits, axis=-1)
+            self.correct_prediction = tf.equal(tf.cast(self.predictions, tf.int32), self.y)
+            self.acc = tf.reduce_mean(tf.cast(self.correct_prediction,tf.float32), axis=0)
 
