@@ -57,7 +57,8 @@ class Bimpm(object):
 
     def attentive_match(self, metirc1, metirc2, w):
         cosine = tf.matmul(metric1, tf.transpose(metric2, [0,2,1]))
-        norm = tf.norm(metric1, axis=-1, keep_dims=True) * tf.norm(metric2, axis=-1, keep_dims=True)
+        norm = tf.norm(metric1, axis=-1, keep_dims=True) * tf.transpose(
+                                   tf.norm(metric2, axis=-1, keep_dims=True), perm=[0,2,1])
         cosine = tf.divide(cosine, norm)
 
         metric1_att = tf.matmul(cosine, metric2)
