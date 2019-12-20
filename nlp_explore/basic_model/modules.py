@@ -143,6 +143,10 @@ def multihead_attention(queries, keys, values, key_masks,
                        training=True,
                        causality=False,
                        scope="multihead_attention"):
+    """
+    key_masks: A 2d tensor with shape of [N, key_seqlen]
+    causality: Boolean. If true, units that reference the future are masked.
+    """
     d_model = queries.shape[-1]
     with tf.variable_scope(scope, reuse=tf.AUTO_REUSE):
         # linear projections
@@ -156,3 +160,30 @@ def multihead_attention(queries, keys, values, key_masks,
         V_ = tf.concat(tf.split(V, num_heads, axis=-1), axis=0)
 
         # attention
+        outputs = scaled_dot_product_attention(Q_, K_, V_, key_masks, causality, dropout_rate, training)
+
+        outputs = tf.concat(tf.split(outputs, num_heads, axis=0), axis=2) # (N, T_q, d_model)
+
+        # residual connection
+        outputs += queries
+
+        # normalize
+        outputs = ln(outputs)
+
+    return outputs
+
+# layer normalization
+def ln(x, epsilon=1e-8, scope="ln"):
+    """layer normalization."""
+    with tf.variable_scope(scope, reuse=tf.AUTO_REUSE):
+        input_shape = x.get_shape()
+        params_shape = input_shape[-1:]
+
+        mean, variance = tf.nn.moments(x, [-1], keep_dims=True)
+        beta = tf.get_variable("beta", params_shape, initializer=tf.zeros_initializer())
+        gamma = tf.get_variable("gamma", params_shape, initializer=tf.ones_initializer())
+        normalized = (inputs-mean) / ((variance+epsilon) ** 0.5)
+        outputs = gamma * normalized + beta
+
+    return outputs
+
