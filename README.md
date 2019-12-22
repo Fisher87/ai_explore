@@ -1,13 +1,14 @@
 AI_EXPLORE
+
 ![](https://readthedocs.org/projects/pygorithm/badge/?version=latest) ![](https://img.shields.io/badge/python%20-%202.7-brightgreen.svg)
 ========
 > 包含机器学习、深度学习基础知识. 推荐系统及nlp相关算法;
 
 ## [机器学习](https://github.com/Fisher87/ai_explore/tree/master/ml_explore)
 
-#### [machine learning](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/machine_learning)
+#### [machine learning](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/machineLearning)
 
-#### [deep learning](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/deep_learning)
+#### [deep learning](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/deepLearning)
 
 ---
 
@@ -18,7 +19,8 @@ AI_EXPLORE
 + [RNN/LSTM](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/basic_model/rnn.py)
 + [Transformer](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/basic_model/transformer.py)
 + [HighWay](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/basic_model/highway.py)
-+ [modules](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/basic_model/modules.py): 基础模型常用函数模块
+> 基础模型常用函数模块
++ [modules](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/basic_model/modules.py)
 
 ### [常用nlp任务](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task)
 + [classify](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/classify)
