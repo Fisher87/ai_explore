@@ -1,4 +1,4 @@
-AI_EXPLORE
+**AI_EXPLORE**
 
 ![](https://readthedocs.org/projects/pygorithm/badge/?version=latest) ![](https://img.shields.io/badge/python%20-%202.7-brightgreen.svg)
 ========
