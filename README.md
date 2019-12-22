@@ -23,14 +23,14 @@ AI_EXPLORE
 + [modules](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/basic_model/modules.py)
 
 ### [常用nlp任务](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task)
-+ [classify](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/classify)
-+ [ner](http://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/ner)
-+ [text_match](http://github.com/Fisher87/ai_explore/tree/master/nlp_explore/text_match):
-  + lexical:
++ [文本分类(classify)](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/classify)
++ [实体识别(ner)](http://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/ner)
++ [文本匹配(text_match)](http://github.com/Fisher87/ai_explore/tree/master/task/text_match):
+  + [文本相关算法](http://github.com/Fisher87/ai_explore/tree/master/task/text_match/lexical):
     + BM25
     + LSI
     + TFIDF
-  + semantic:
+  + [语义相关算法](http://github.com/Fisher87/ai_explore/tree/master/task/text_match/semantic):
     + DSSM
     + ABCNN
     + TPConvNet
@@ -41,14 +41,20 @@ AI_EXPLORE
 
 ## [推荐系统](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore)
 ### [常用召回策略](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/recall)
-+ CF:
++ [CF](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/recall/CF):
   + item_based
   + user_based
   + graph
-+ LMF
++ [LMF](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/recall/LMF)
   + ALS
   + MF
-+ DeepMatch:
++ [DeepMatch](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/recall/DeepMatch):
 
 ### [常用排序策略](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/rank)
+### [竞赛及其解决方案](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/competition)
 
+## 理论思维导图
++ [传统机器学习.xmind](https://github.com/Fisher87/ai_explore/blob/master/xmind/%E4%BC%A0%E7%BB%9F%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0.xmind)
++ [深度学习.xmind](https://github.com/Fisher87/ai_explore/blob/master/xmind/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0.xmind)
++ [自然语言处理.xmind](https://github.com/Fisher87/ai_explore/blob/master/xmind/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86.xmind)
++ [推荐系统.xmind](https://github.com/Fisher87/ai_explore/blob/master/xmind/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F.xmind)
