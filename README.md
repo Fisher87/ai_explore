@@ -6,14 +6,14 @@
 
 ## [机器学习](https://github.com/Fisher87/ai_explore/tree/master/ml_explore)
 
-#### [machine learning](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/machineLearning)
+##### [machine learning](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/machineLearning)
 
-#### [deep learning](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/deepLearning)
+##### [deep learning](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/deepLearning)
 
 ---
 
 ## [自然语言处理](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore)
-### [基础模型实现](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/basic_model)
+#### [基础模型实现](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/basic_model)
 + [DNN](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/basic_model/dnn.py)
 + [CNN](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/basic_model/cnn.py)
 + [RNN/LSTM](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/basic_model/rnn.py)
@@ -22,7 +22,7 @@
 > 基础模型常用函数模块
 + [modules](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/basic_model/modules.py)
 
-### [常用nlp任务](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task)
+#### [常用nlp任务](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task)
 + [文本分类(classify)](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/classify)
 + [实体识别(ner)](http://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/ner)
 + [文本匹配(text_match)](http://github.com/Fisher87/ai_explore/tree/master/task/text_match):
@@ -40,7 +40,7 @@
 ---
 
 ## [推荐系统](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore)
-### [常用召回策略](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/recall)
+#### [常用召回策略](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/recall)
 + [CF](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/recall/CF):
   + item_based
   + user_based
@@ -50,8 +50,8 @@
   + MF
 + [DeepMatch](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/recall/DeepMatch):
 
-### [常用排序策略](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/rank)
-### [竞赛及其解决方案](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/competition)
+#### [常用排序策略](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/rank)
+#### [竞赛及其解决方案](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/competition)
 
 ## [理论思维导图](https://github.com/Fisher87/ai_explore/tree/master/xmind)
 + [传统机器学习.xmind](https://github.com/Fisher87/ai_explore/blob/master/xmind/%E4%BC%A0%E7%BB%9F%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0.xmind)
