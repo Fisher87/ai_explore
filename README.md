@@ -52,7 +52,21 @@
 
 #### [常用排序策略](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/rank)
 + [基于传统机器学习](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/rank/classical_ml)
+    + LR
+    + GBDT+LR
+    + FM/FFM
+
 + [基于深度算法](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/rank/deep_dl)
+    + Wide_Deep
+    + DeepFM
+    + PNN
+    + FNN
+    + DCN
+    + DIN
+    + DIIN
++ [在线训练](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/rank/online)
+    + FTRL
+
 #### [竞赛及其解决方案](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/competition)
 
 ## [理论思维导图](https://github.com/Fisher87/ai_explore/tree/master/xmind)
