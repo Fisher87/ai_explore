@@ -1,6 +1,6 @@
 **AI_EXPLORE**
 
-![](https://readthedocs.org/projects/pygorithm/badge/?version=latest) ![](https://img.shields.io/badge/python%20-%202.7-brightgreen.svg)
+![](https://readthedocs.org/projects/pygorithm/badge/?version=latest) ![](https://img.shields.io/badge/python%20-%203.7-brightgreen.svg)
 ========
 > 包含机器学习、深度学习基础知识. 推荐系统及nlp相关算法;
 
@@ -25,12 +25,12 @@
 #### [常用nlp任务](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task)
 + [文本分类(classify)](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/classify)
 + [实体识别(ner)](http://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/ner)
-+ [文本匹配(text_match)](http://github.com/Fisher87/ai_explore/tree/master/task/text_match):
-  + [文本相关算法](http://github.com/Fisher87/ai_explore/tree/master/task/text_match/lexical):
++ [文本匹配(text_match)](http://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/text_match):
+  + [文本相关算法](http://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/text_match/lexical):
     + BM25
     + LSI
     + TFIDF
-  + [语义相关算法](http://github.com/Fisher87/ai_explore/tree/master/task/text_match/semantic):
+  + [语义相关算法](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/text_match/semantic):
     + DSSM
     + ABCNN
     + TPConvNet
