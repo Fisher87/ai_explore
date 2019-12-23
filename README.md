@@ -71,6 +71,8 @@
 
 #### [竞赛及其解决方案](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/competition)
 
+---
+
 ## [理论思维导图](https://github.com/Fisher87/ai_explore/tree/master/xmind)
 + [传统机器学习.xmind](https://github.com/Fisher87/ai_explore/blob/master/xmind/%E4%BC%A0%E7%BB%9F%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0.xmind)
 + [深度学习.xmind](https://github.com/Fisher87/ai_explore/blob/master/xmind/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0.xmind)
