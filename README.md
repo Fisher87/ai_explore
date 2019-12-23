@@ -36,6 +36,8 @@
     + TPConvNet
     + ESIM
     + BIMPM
+    + DIIN
+    + DRCN
 
 ---
 
@@ -63,7 +65,7 @@
     + FNN
     + DCN
     + DIN
-    + DIIN
+    + DIEN
 + [在线训练](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/rank/online)
     + FTRL
 
