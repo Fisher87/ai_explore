@@ -12,6 +12,20 @@
 
 import tensorflow as tf
 
+def length(sequence):
+    """
+    Get true length of sequences (without padding), and mask for true-length in max-length.
+
+    Input of shape: (batch_size, max_seq_length, hidden_dim)
+    Output shapes,
+    length: (batch_size)
+    mask: (batch_size, max_seq_length, 1)
+    """
+    populated = tf.sign(tf.abs(sequence))
+    length = tf.cast(tf.reduce_sum(populated, axis=1), tf.int32)
+    mask = tf.cast(tf.expand_dims(populated, -1), tf.float32)
+    return length, mask
+
 def dropout_layer(inputs, dropout_rate, is_training=True):
     if is_training:
         output_repr = tf.nn.dropout(input_reps, (1 - dropout_rate))
