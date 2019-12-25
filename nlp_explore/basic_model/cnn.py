@@ -68,3 +68,16 @@ def conv1d(inputs, filter_size, out_channels, padding, name"conv1d"):
         conv = tf.nn.conv1d(inputs, filters, strides, padding)
         return conv
 
+def max_pool(inputs, seq_length, filter_size, name="max-pooling"):
+    """
+    @param: inputs, 
+    @param: seq_length,
+    @param: filter_size,
+    """
+    assert seq_length==inputs.get_shape()[1]
+    with tf.variable_scope(name):
+        pooled = tf.nn.max_pool(inputs, 
+                               ksize=[1, seq_length-filter_size+1, 1, 1],
+                               strides=[1, 1, 1, 1],
+                               name="pool")
+        return pooled

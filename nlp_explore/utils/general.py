@@ -11,6 +11,7 @@
 #================================================================
 
 import tensorflow as tf
+from operator import mul
 
 def length(sequence):
     """
@@ -66,3 +67,35 @@ def euclidean_distance(v1, v2, eps=1e-6):
     distance = tf.sqrt(tf.maximum(tf.reduce_sum(tf.square(y1 - y2), axis=-1), eps))
     return distance
 
+
+# tensor 展开与重组
+##################################################
+def flatten(inputs, keep):
+    """
+    将输入展开, keep 为保留几个维度不进行展开处理;
+    """
+    fixed_shape = inputs.get_shape().as_list()
+    start = len(fixed_shape) - keep
+    left = reduce(mul, [fixed_shape[i] for i in range(start)])
+    out_shape = [left] + [fixed_shape[i] for i in range(start, len(fixed_shape))]
+    flat = tf.reshape(inputs, out_shape)
+
+    return flat
+
+def reconstruct(inputs, ref, keep):
+    """
+    与flatten作用相反;
+    @param: inputs, 经过flatten展开后的结果;
+    @param: ref, 未flatten处理的原始数据;
+    """
+    ref_shape = ref.get_shape().as_list()
+    input_shape = inputs.get_shape().as_list()
+    ref_stop = len(ref_shape) - keep
+    input_start = len(input_shape) - keep
+    pre_shape = [ref_shape[i] for i in range(ref_stop)]
+    keep_shape= [input_shape[i] for i in range(input_start, len(input_shape))]
+    target_shape = pre_shape + keep_shape
+    out = tf.reshape(inputs, target_shape)
+
+    return out
+##################################################
