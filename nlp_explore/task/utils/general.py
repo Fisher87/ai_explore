@@ -99,3 +99,70 @@ def reconstruct(inputs, ref, keep):
 
     return out
 ##################################################
+
+def _linear(args, output_size, bias, bias_start=0.0, scope=None):
+    """Linear map: sum_i(args[i] * W[i]), where W[i] is a variable.
+
+    Args:
+      args: a 2D Tensor or a list of 2D, batch x n, Tensors.
+      output_size: int, second dimension of W[i].
+      bias: boolean, whether to add a bias term or not.
+      bias_start: starting value to initialize the bias; 0 by default.
+      scope: (optional) Variable scope to create parameters in.
+
+    Returns:
+      A 2D Tensor with shape [batch x output_size] equal to
+      sum_i(args[i] * W[i]), where W[i]s are newly created matrices.
+
+    Raises:
+      ValueError: if some of the arguments has unspecified or wrong shape.
+    """
+    if args is None or (nest.is_sequence(args) and not args):
+        raise ValueError("`args` must be specified")
+    if not nest.is_sequence(args):
+        args = [args]
+
+    # Calculate the total size of arguments on dimension 1.
+    total_arg_size = 0
+    shapes = [a.get_shape() for a in args]
+    for shape in shapes:
+        if shape.ndims != 2:
+            raise ValueError("linear is expecting 2D arguments: %s" % shapes)
+        if shape[1].value is None:
+            raise ValueError("linear expects shape[1] to be provided for shape %s, "
+                           "but saw %d" % (shape, shape[1]))
+        else:
+            total_arg_size += shape[1].value
+
+    dtype = [a.dtype for a in args][0]
+
+    # Now the computation.
+    scope = tf.get_variable_scope()
+    with tf.variable_scope(scope) as outer_scope:
+        weights = tf.get_variable(
+            "weights", [total_arg_size, output_size], dtype=dtype)
+        if len(args) == 1:
+            res = tf.matmul(args[0], weights)
+        else:
+            res = tf.matmul(array_ops.concat(1, args), weights)
+        if not bias:
+            return res
+        with vs.variable_scope(outer_scope) as inner_scope:
+            inner_scope.set_partitioner(None)
+            biases = vs.get_variable(
+                "biases", [output_size],
+                dtype=dtype,
+                initializer=init_ops.constant_initializer(bias_start, dtype=dtype))
+    return nn_ops.bias_add(res, biases)
+
+# tensor shape
+##################################################
+def shape(tensor, dim=None):
+    '''
+    get tensor shape/dimension as list/int.
+    '''
+    if not dim:
+        return tensor.shape.as_list()
+    if dim:
+        return tensor.shape.as_list()[dim]
+
