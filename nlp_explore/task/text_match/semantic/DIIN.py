@@ -7,11 +7,17 @@
 #   创 建 者：YuLianghua
 #   创建日期：2019年12月25日
 #   描    述：
+#           reference : [1]. git@github.com:YichenGong/Densely-Interactive-Inference-Network.git
+#                       [2]. git@github.com:terrifyzhao/text_matching.git
+#                      
 #
 #================================================================
 
 import tensorflow as tf
 from tensorflow.python.ops import rnn_cell_impl
+from utils.general import _linear
+from utils.general import flatten
+from utils.general import reconstruct
 
 class DIIN(object):
     def __init__(self, **kwargs):
