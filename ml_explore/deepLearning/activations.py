@@ -73,11 +73,19 @@ def maxtanh(x, name="max_tanh_act"):
     with tf.variable_scope(name):
         return tf.maximum(x, tf.tanh(x))
 
+def gelu(x, name="gelu"):
+    """
+    reference: https://arxiv.org/pdf/1606.08415.pdf
+    """
+    with tf.variable_scope(name):
+        return 0.5 * x * (1 + tf.tanh(np.sqrt(2/np.pi) * (x + 0.044715*tf.pow(x, 3))))
+
 def activation(active_type='swish', **kwargs):
     activation_funcs = {
             "cosper": cosper,
             "cube"  : cube,
             "elu": tf.nn.elu,
+            "gelu": gelu,
             "leaky_relu": leaky_relu,
             "maxsig" : maxsig,
             "maxtanh": maxtanh,
