@@ -2,7 +2,7 @@
 
 ------
 
-#### [FNN(Factorisation-machine supported Neural Networks)](https://arxiv.org/pdf/1601.02376.pdf)
+#### [2.FNN(Factorisation-machine supported Neural Networks)](https://arxiv.org/pdf/1601.02376.pdf)
 
 ![模型框架](https://github.com/Fisher87/ai_explore/blob/master/src/FNN.png)
 
@@ -11,24 +11,24 @@
 
 ------
 
-#### [2.PNN]()
+#### [3.PNN]()
 
 
 ------
 
 
-#### [3.WideDeep]()
+#### [4.WideDeep]()
 
 ------
 
-#### [4.DeepFM]()
+#### [5.DeepFM]()
 
 ------
 
-#### [5.DIN]()
+#### [6.DIN]()
 
 ------
 
-#### [6.DCN]()
+#### [7.DCN]()
 
 ------
