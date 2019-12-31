@@ -42,7 +42,6 @@ class FNN(object):
     def __call__(self):
         # init placeholder
         # 每个field 单独处理
-        # 这里的输入应该使用FM 进行embedding的结果;
         self.x = [tf.sparse_placeholder(dtype=tf.float32, shape=[None,None], name="x_%s" %i) for i in range(self.filed_size)]
         self.y = tf.placeholder(tf.float32, name="y")
         self.keep_drop = tf.placeholder(tf.float32, name="keep_prob")
@@ -50,6 +49,7 @@ class FNN(object):
         num_inputs = len(self.field_sizes)
         # init field embedding
         for i in range(num_inputs):
+            # 这里的输入应该使用FM 进行embedding的结果, 这里选择随机初始化;
             embed_v = tf.get_variable("embed_%s" %i, shape=[self.field_sizes[i], self.embedding_size]
                                      initializer=tf.contrib.layers.xavier_initializer(), dtype=tf.float32)
             setattr(self, "embed_%s" %i, embed_v)
