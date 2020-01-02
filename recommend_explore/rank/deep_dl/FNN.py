@@ -85,7 +85,7 @@ class FNN(object):
             self.y_prob = tf.sigmoid(f_out)
 
             self.loss = tf.reduce_mean(
-                tf.nn.sigmoid_cross_entropy_with_logits(logits=self.y_prob, labels=self.y))
+                tf.nn.sigmoid_cross_entropy_with_logits(logits=f_out, labels=self.y))
             if self.layer_l2 is not None:
                 self.loss += self.embed_l2 * tf.nn.l2_loss(xw)
                 for i in range(len(self.layer_sizes)):
