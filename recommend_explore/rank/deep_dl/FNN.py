@@ -50,7 +50,7 @@ class FNN(object):
         # init field embedding
         for i in range(num_inputs):
             # 这里的输入应该使用FM 进行embedding的结果, 这里选择随机初始化;
-            embed_v = tf.get_variable("embed_%s" %i, shape=[self.field_sizes[i], self.embedding_size]
+            embed_v = tf.get_variable("embed_%s" %i, shape=[self.field_sizes[i], self.embedding_size],
                                      initializer=tf.contrib.layers.xavier_initializer(), dtype=tf.float32)
             setattr(self, "embed_%s" %i, embed_v)
 

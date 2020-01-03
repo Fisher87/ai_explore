@@ -111,7 +111,7 @@ class PNN(object):
             # lp = tf.matmul(self.lz, tf.transpose(self.lz, perm=[0,2,1]))  # (b * num_inputs * num_inputs)
             # self.lp = tf.reshape(lp, [-1, num_inputs**2])
             
-            out = tf.concat([lz, self.lp], 1)
+            out = tf.concat([lz, self.lp], 1)  #(batch, num_inputs * self.embedding_size + num_pairs)
 
             # nn layer
             for i in range(len(layer_sizes)):
