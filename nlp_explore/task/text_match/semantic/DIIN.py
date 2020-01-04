@@ -68,6 +68,27 @@ class DIIN(object):
 
         return res
 
+    def dense_net(self, v):
+        filters = int(v.shape[-1] * self.dense_net_first_scale_down_ratio)
+        v_in = tf.layers.conv2d(v, filters=filters, kernel_size=(1, 1))
+        for _ in range(3):
+            for _ in range(8):
+                v_out = tf.layers.conv2d(v_in,
+                                         filters=self.dense_growth_rate,
+                                         kernel_size=(3, 3),
+                                         padding='SAME',
+                                         activation='relu')
+                v_in = tf.concat((v_in, v_out), axis=-1)
+            transition = tf.layers.conv2d(v_in,
+                                          filters=int(v_in.shape[-1].value * self.dense_net_transition_rate),
+                                          kernel_size=(1, 1))
+            transition_out = tf.layers.max_pooling2d(transition,
+                                                     pool_size=(2, 2),
+                                                     strides=2)
+            v_in = transition_out
+        return v_in
+
+
     def encode(self, x):
         attention = self.self_attention(x, is_train=True, squeeze=True)
         x_att = self.softsel(x, attention)
@@ -154,24 +175,4 @@ class DIIN(object):
         self.predict = tf.argmax(self.logits, axis=1, name="predictions")
         correct_prediction = tf.equal(tf.cast(self.predict, tf.int32), self.y)
         self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32), name="Accuracy")
-
-    def dense_net(self, v):
-        filters = int(v.shape[-1] * self.dense_net_first_scale_down_ratio)
-        v_in = tf.layers.conv2d(v, filters=filters, kernel_size=(1, 1))
-        for _ in range(3):
-            for _ in range(8):
-                v_out = tf.layers.conv2d(v_in,
-                                         filters=self.dense_growth_rate,
-                                         kernel_size=(3, 3),
-                                         padding='SAME',
-                                         activation='relu')
-                v_in = tf.concat((v_in, v_out), axis=-1)
-            transition = tf.layers.conv2d(v_in,
-                                          filters=int(v_in.shape[-1].value * self.dense_net_transition_rate),
-                                          kernel_size=(1, 1))
-            transition_out = tf.layers.max_pooling2d(transition,
-                                                     pool_size=(2, 2),
-                                                     strides=2)
-            v_in = transition_out
-        return v_in
 

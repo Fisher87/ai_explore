@@ -120,10 +120,11 @@ class ESIM(object):
         # prediction layer
         v = tf.layers.dense(v, 512, activation="tanh")
         v = self.dropout(v)
+        y = tf.one_hot(self.y, self.num_classes)
         self.logits = tf.layers.dense(v, self.num_classes, activation="tanh")
         self.prob = tf.nn.softmax(self.logits)
         self.prediction = tf.argmax(self.logits, axis=1)
-        loss = tf.nn.softmax_cross_entropy_with_logits(labels=self.y, logits=self.logits)
+        loss = tf.nn.softmax_cross_entropy_with_logits(labels=y, logits=self.logits)
         self.loss = tf.reduce_mean(loss, axis=0)
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
         correct_prediction = tf.equal(tf.cast(self.prediction, tf.int32), self.y)
