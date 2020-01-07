@@ -114,3 +114,4 @@ def reduce_mean_encoder(inputs, lengths):
     """
     return tf.reduce_sum(inputs, axis=1) / tf.expand_dims(lengths, 1)
 
+
