@@ -47,14 +47,17 @@
   + item_based
   + user_based
   + graph
+
 + [LMF](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/recall/LMF)
   + ALS
   + MF
+
 + [DeepMatch](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/recall/DeepMatch):
 
 #### [常用排序策略](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/rank)
 + [基于传统机器学习](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/rank/classical_ml)
     + LR
+    + [MLR](https://zhuanlan.zhihu.com/p/100532677)
     + GBDT+LR
     + FM/FFM
 
@@ -66,6 +69,7 @@
     + DCN
     + DIN
     + DIEN
+
 + [在线训练](https://github.com/Fisher87/ai_explore/tree/master/recommend_explore/rank/online)
     + FTRL
 
