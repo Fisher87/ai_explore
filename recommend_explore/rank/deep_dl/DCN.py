@@ -73,7 +73,7 @@ class DeepCross(object):
 
         self.out = tf.layers.dense(concat_out, 
                                   self.num_classes,
-                                  activation="sigmoid")
+                                  activation=tf.nn.sigmoid)
         self.logits = tf.sigmoid(self.out)
 
         # loss
@@ -91,7 +91,7 @@ class DeepCross(object):
         for i in range(len(self.deep_layer_sizes)):
             self.deep_out = tf.layers.dense(self.deep_out, 
                                          deep_layer_sizes[i],
-                                         activation="relu")
+                                         activation=tf.nn.relu)
             self.deep_out = tf.nn.dropout(self.deep_out, self.deep_keep_prob[i])
 
 

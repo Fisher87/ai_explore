@@ -51,7 +51,7 @@ class DeepFM(object):
         concat_input = tf.concat([linear_out, interaction_output, deep_out], axis=1)
         logits = tf.layers.dense(concat_input,
                              self.num_classes,
-                             activation="sigmoid")
+                             activation=tf.nn.sigmoid)
 
         # loss
         self.y_prob = tf.nn.softmax(self.logits)
@@ -89,7 +89,7 @@ class DeepFM(object):
             for i in range(len(self.deep_layer_sizes)):
                 self.y_deep = tf.layers.dense(self.y_deep, 
                                              deep_layer_sizes[i],
-                                             activation="relu")
+                                             activation=tf.nn.relu)
                 self.y_deep = tf.nn.dropout(self.y_deep, self.deep_keep_prob[i])
 
         return self.y_deep

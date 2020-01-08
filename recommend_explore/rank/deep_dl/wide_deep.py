@@ -41,7 +41,7 @@ class WideDeep(object):
             # wide 部分使用的特征: cross product transformation生成的组合特征;
             wide_input = tf.concat([self.category_x, self.cross_x], axis=-1)
             # wide_out = tf.layers.dense(wide_input, self.y.shape[1], 
-            #                           activation="sigmoid",
+            #                           activation=tf.nn.sigmoid,
             #                           use_bias=True,
             #                           )
             wide_out = wide_input
@@ -54,13 +54,13 @@ class WideDeep(object):
             deep_input = tf.concat([tf.reshape(embeddings, [-1, self.category_feature_size*self.embedding_size]), 
                                    self.continue_x, self.category_inx, self.continue_inx], axis=-1)
             d = tf.layers.dense(deep_input, 50,
-                               activation="relu", 
+                               activation=tf.nn.relu, 
                                use_bias=True,
                                )
             d = tf.dropout(d, self.keep_drop)
 
             d = tf.layers.dense(d, 20,
-                               activation="relu",
+                               activation=tf.nn.relu,
                                use_bias=True)
             deep_out = tf.dropout(d, self.keep_drop)
 
@@ -71,7 +71,7 @@ class WideDeep(object):
 
         wd_in = tf.concat([wide_out, deep_out], axis=-1)
         self.logits = tf.layers.dense(wd_in, self.num_classes, 
-                                    activation="sigmoid",
+                                    activation=tf.nn.sigmoid,
                                     name="wide_deep")
         self.y_prob = tf.nn.softmax(self.logits)
         self.prediction = tf.argmax(self.logits, axis=-1)
