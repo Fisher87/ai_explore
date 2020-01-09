@@ -57,7 +57,7 @@ Wide&Deep 中还允许输入连续的特征，这点与 FNN 不同，连续特�
 
 ------
 
-#### [6.DIN]()
+#### [6.DIN(Deep Interest Network)]()
 > [paper](https://arxiv.org/pdf/1706.06978.pdf)
 
 ![DIN模型框架](https://github.com/Fisher87/ai_explore/blob/master/src/DIN.png)
