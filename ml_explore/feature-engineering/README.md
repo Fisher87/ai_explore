@@ -130,6 +130,7 @@ SelectKBest(lambda X, Y: array(map(lambda x:pearsonr(x, Y), X.T)).T, k=2).fit_tr
 ##### 3.1.3 卡方检验
 
 经典的卡方检验是检验定性自变量对定性因变量的相关性。
+
 ![kf](https://cdn.nlark.com/yuque/0/2019/jpeg/160480/1553682303681-e2fd054b-8d43-4f86-b263-214c9464b7ad.jpeg)
 
 ```python
@@ -142,6 +143,7 @@ SelectKBest(chi2, k=2).fit_transform(iris.data, iris.target)
 ##### 3.1.4 互信息法
 
 经典的互信息也是评价定性自变量对定性因变量的相关性的，互信息计算公式如下：
+
 ![互信息](https://cdn.nlark.com/yuque/0/2019/jpeg/160480/1553682303683-66c5d62c-4aba-4654-aaac-82bf919cf13a.jpeg)
 
 ```python
