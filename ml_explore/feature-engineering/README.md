@@ -270,4 +270,5 @@ from sklearn.lda import LDA
 LDA(n_components=2).fit_transform(iris.data, iris.target)
 ```
 
-
+#### 参考博客
+[\[1\].特征工程实战](https://www.yuque.com/u50316/kb/cpfecf)
