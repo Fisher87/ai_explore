@@ -68,5 +68,21 @@ Wide&Deep 中还允许输入连续的特征，这点与 FNN 不同，连续特�
 
 DIN模型在对用户的表示计算上引入了attention network (也即图中的Activation Unit) 。DIN把用户特征、用户历史行为特征进行embedding操作，视为对用户兴趣的表示，之后通过attention network，对每个兴趣表示赋予不同的权值。这个权值是由用户的兴趣和待估算的广告进行匹配计算得到的，如此模型结构符合了之前的两个观察——用户兴趣的多样性以及部分对应。
 
+DIN模型存在两个缺点:
++ 用户的兴趣是不断进化的，而DIN抽取的用户兴趣之间是独立无关联的，没有捕获到兴趣的动态进化性；
+
++ 通过用户的显式行为来表达用户隐含的兴趣，准确性无法得到保证；
+
 ------
 
+#### [7.DIEN(Deep Interest Evolution Network)]()
+> [paper](https://arxiv.org/pdf/1809.03672.pdf)
+
+DIEN模型的主要贡献有：
++ 模型关注电商系统中兴趣演化的过程，并提出了新的网络结果来建模兴趣进化的过程，这个模型能够更精确的表达用户兴趣，同时带来更高的CTR预估准确率。
++ 设计了**兴趣抽取层**，并通过计算一个辅助loss，来提升兴趣表达的准确性。
++ 设计了**兴趣进化层**，来更加准确的表达用户兴趣的动态变化性。
+
+![DIEN模型框架](https://github.com/Fisher87/ai_explore/blob/master/src/DIEN.png)
+
+DIEN将user behavior组织成了序列数据的形式，并把简单的使用外积完成的activation unit变成了一个attention-based GRU网络。
