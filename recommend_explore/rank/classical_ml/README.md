@@ -1,3 +1,28 @@
-#### 参考博客
-[1.FM算法(一)：算法理论](https://blog.csdn.net/DellTower/article/details/82219676)
-[2.FM算法(二)：工程实现](https://www.cnblogs.com/AndyJee/p/8032553.html)
+#### [1.LR]()
+
+LR模型的算法原理及细节参考[传统机器学习.xmind](https://github.com/Fisher87/ai_explore/blob/master/xmind/%E4%BC%A0%E7%BB%9F%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0.xmind)
+
+为什么LR模型能够占据计算广告、推荐等领域：
+LR作为广义线性模型的一种，它的假设是因变量y服从**伯努利分布**。那么在点击率预估这个问题上，“点击”这个事件是否发生就是模型的因变量y。而用户是否点击广告这个问题是一个经典的掷偏心硬币（二分类）问题，因此CTR模型的因变量显然应该服从伯努利分布。所以采用LR作为CTR模型是符合“点击”这一事件的物理意义的。
+
+另外LR的数学形式也极具有解释性:
+$h_{\theta}(x) = \frac{1}{1+e^{-\theta^Tx}}$
+其中x是输入向量，θ 是我们要学习的参数向量。结合CTR模型的问题来说，x就是输入的特征向量， 结果就是我们模型预测得到的点击率
+
+#### [2.MLR]()
+
+
+#### [3.FM]()
+
+
+#### [4.FFM]()
+
+
+#### [5.GBDT+LR]()
+
+
+
+##### 参考博客
+[1.LR逻辑回归(非常详细)](https://zhuanlan.zhihu.com/p/74874291?utm_source=wechat_session&utm_medium=social&utm_oi=642330513952739328)
+[2.FM算法(一)：算法理论](https://blog.csdn.net/DellTower/article/details/82219676)
+[3.FM算法(二)：工程实现](https://www.cnblogs.com/AndyJee/p/8032553.html)
