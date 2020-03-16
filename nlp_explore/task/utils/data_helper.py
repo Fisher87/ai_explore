@@ -19,7 +19,6 @@ import numpy as np
 from collections import defaultdict
 from sklearn.model_selection import train_test_split
 
-
 class DataHelper(object):
     def __init__(self, fpath, vocab_path, seg_label='\t', fields=[], startline=0):
         self.fpath = fpath
@@ -98,12 +97,19 @@ def padding(data, maxlen=None):
 
     return (idlist, maxlen)
 
-def train_test_data_split(x, y, shuffle=True, test_size=0.2):
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, shuffle=shuffle)
+def train_test_data_split(x, y, 
+                          shuffle=True, 
+                          test_size=0.2):
+    x_train, x_test, y_train, y_test = train_test_split(x, y, 
+                                                        test_size=test_size, 
+                                                        shuffle=shuffle)
 
     return (x_train, x_test, y_train, y_test)
 
-def train_dev_test_data_split(data, shuffle=True, dev_size=0.1, test_size=0.2):
+def train_dev_test_data_split(data, 
+                              shuffle=True, 
+                              dev_size=0.1, 
+                              test_size=0.2):
     _x_data = [d[0] for d in data]
     _y_data = [d[1] for d in data]
     if shuffle:
@@ -117,30 +123,35 @@ def train_dev_test_data_split(data, shuffle=True, dev_size=0.1, test_size=0.2):
     train_size = 1.0 - (dev_size + test_size)
     dev_sample_index = int(train_size * float(len(_y_data)))
     test_sample_index= int((train_size + dev_size) * float(len(_y_data)))
-    x_train, x_dev, x_test = x_data[:dev_sample_index], x_data[dev_sample_index:test_sample_index], x_data[test_sample_index:]
-    y_train, y_dev, y_test = y_data[:dev_sample_index], y_data[dev_sample_index:test_sample_index], y_data[test_sample_index:]
+    x_train, x_dev, x_test = x_data[:dev_sample_index], \
+                             x_data[dev_sample_index:test_sample_index], \
+                             x_data[test_sample_index:]
+    y_train, y_dev, y_test = y_data[:dev_sample_index], \
+                             y_data[dev_sample_index:test_sample_index], \
+                             y_data[test_sample_index:]
 
     del x_data, y_data, _x_data, _y_data
 
     return (x_train, y_train, x_dev, y_dev, x_test, y_test)
 
-def batch_iter(data,batch_size,num_epochs,shuffle=True):
+def batch_iter(data, batch_size, num_epochs, 
+               shuffle=True):
     """
     gengrate a batch iterator for dataset.
     """
-    data=np.array(data)
-    data_size=len(data)
-    num_batches_per_epoch=int((data_size-1)/batch_size)+1
+    data = np.array(data)
+    data_size = len(data)
+    num_batches_per_epoch = int((data_size-1)/batch_size)+1
     for epoch in range(num_epochs):
         if shuffle:
-            shuffle_indices=np.random.permutation(np.arange(data_size))
-            shuffled_data=data[shuffle_indices]
-    else:
-        shuffled_data=data
-    for batch_num in range(num_batches_per_epoch):
-        start_index=batch_num*batch_size
-        end_index=min(batch_size*(batch_num+1), data_size)
-        yield shuffled_data[start_index:end_index]
+            shuffle_indices = np.random.permutation(np.arange(data_size))
+            shuffled_data = data[shuffle_indices]
+        else:
+            shuffled_data = data
+        for batch_num in range(num_batches_per_epoch):
+            start_index = batch_num*batch_size
+            end_index = min(batch_size*(batch_num+1), data_size)
+            yield shuffled_data[start_index:end_index]
 
 def one_hot_encode(x):
     """
@@ -159,11 +170,11 @@ def one_hot_encode(x):
     return b.tolist()
 
 if __name__ == "__main__":
-    # fpath = "../data/classify/data.csv"
-    # vocab_path = "../data/vocab.txt"
-    # data_helper = DataHelper(fpath, vocab_path, fields=["y", "x"], startline=1)
-    # data_list = data_helper.get_data(padding=False)
-    # print(data_list["x"][:10])
-    a = [1, 0, 3]
-    b = one_hot_encode(a)
+    fpath = "../data/classify/data.csv"
+    vocab_path = "../data/vocab.txt"
+    data_helper = DataHelper(fpath, vocab_path, fields=["y", "x"], startline=1)
+    data_list = data_helper.get_data(padding=False)
+    print(data_list["x"][:10])
+    # a = [1, 0, 3]
+    # b = one_hot_encode(a)
     print(b)
