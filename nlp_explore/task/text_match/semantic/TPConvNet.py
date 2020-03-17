@@ -172,3 +172,4 @@ class ConvNet(object):
             correct_prediction = tf.equal(tf.cast(self.prediction, tf.int32), self.y)
             self.acc = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
             
+        return self
