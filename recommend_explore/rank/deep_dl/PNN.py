@@ -67,10 +67,10 @@ class PNN(object):
         num_pairs = int(0.5 * (num_inputs * (num_inputs-1)))
         
         def build_graph():
+            self.init_weight(num_inputs, num_pairs)
             self.embeddings = tf.nn.embedding_lookup(self.__dict__.get("w_feature_embeddings", self.feature_index), name="embed")
             feature_value = tf.reshape(self.feature_value, shape=[-1, len(self.field_sizes), 1])
             self.embeddings = tf.multiply(self.embeddings, feature_value)
-            self.init_weight(num_inputs, num_pairs)
             
             # linear part
             self.lz = tf.reshape(self.embeddings, [-1, num_inputs, self.embedding_size])
@@ -91,7 +91,7 @@ class PNN(object):
                     # num_inputs * batch * k
                     tf.transpose(self.lz, [1, 0, 2]), 
                     row
-                )
+                ),
                 [1, 0, 2]
             )
             
@@ -107,9 +107,6 @@ class PNN(object):
             p = tf.reshape(p, [-1, num_pairs, embed_size])
             q = tf.reshape(q, [-1, num_pairs, embed_size])
             self.lp = tf.reshape(tf.reduce_sum(p * q, [-1]), [-1, num_pairs])
-            # 也可以使用
-            # lp = tf.matmul(self.lz, tf.transpose(self.lz, perm=[0,2,1]))  # (b * num_inputs * num_inputs)
-            # self.lp = tf.reshape(lp, [-1, num_inputs**2])
             
             out = tf.concat([lz, self.lp], 1)  #(batch, num_inputs * self.embedding_size + num_pairs)
 
