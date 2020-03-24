@@ -36,6 +36,7 @@ class DSSM(object):
         self.y = tf.placeholder(dtype=tf.int32, shape=[None], name="y")
 
         self.keep_prob = tf.placeholder(dtype=tf.float32, name="keep_prob")
+        self.global_step = tf.Variable(0, name="global_step", trainable=False)
         # embedding layer
         with tf.device('/cpu:0'), tf.name_scope("embedding"):
             if self.random_embedding:
@@ -64,8 +65,10 @@ class DSSM(object):
             # numclasses is 2.
         with tf.name_scope("output"):
             y = tf.one_hot(self.y, self.class_size)
-            self.loss = tf.nn.softmax_cross_entropy_with_logits(labels=y, logits=self.logits)
-            self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
+            loss = tf.nn.softmax_cross_entropy_with_logits(labels=y, logits=self.logits)
+            self.loss = tf.reduce_mean(loss)
+            self.optimier = tf.train.AdamOptimizer(self.learning_rate)
+            self.train_op = self.optimier.minimize(self.loss, global_step=self.global_step)
             self.predictions = tf.argmax(self.logits, axis=1)
             self.correct_pred = tf.equal(tf.cast(self.predictions, tf.int32), self.y)
             self.acc = tf.reduce_mean(tf.cast(self.correct_pred, tf.float32))

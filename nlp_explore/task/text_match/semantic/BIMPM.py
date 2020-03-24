@@ -13,10 +13,20 @@
 import tensorflow as tf
 
 class Bimpm(object):
-    def __init__(self, seq_len, word_embedding_dim, char_embedding_dim, char_vocab_len
-                 char_hidden_size, num_perspective, learning_rate):
+    def __init__(self, 
+                 seq_len, 
+                 char_embedding_dim, 
+                 char_vocab_len,
+                 char_hidden_size, 
+                 num_perspective, 
+                 learning_rate, 
+                 use_word_embedding=False,
+                 word_embedding_dim=None):
         self.seq_len = seq_len
-        self.word_embedding_dim = word_embedding_dim
+        self.use_word_embedding = use_word_embedding
+        if use_word_embedding:
+            assert word_embedding_dim
+            self.word_embedding_dim = word_embedding_dim
         self.char_embedding_dim = char_embedding_dim
         self.char_vocab_len = char_vocab_len
         self.char_hidden_size = char_hidden_size
@@ -75,10 +85,11 @@ class Bimpm(object):
     def __call__(self):
         self.p = tf.placeholder(dtype=tf.int32, shape=[None, self.seq_len], name="p")
         self.h = tf.placeholder(dtype=tf.int32, shape=[None, self.seq_len], name="h")
-        self.p_vec = tf.placeholder(dtype=tf.float32, shape=[None, self.seq_len, self.word_embedding_dim], 
-                                    name="p_word")
-        self.h_vec = tf.placeholder(dtype=tf.float32, shape=[None, self.seq_len, self.word_embedding_dim], 
-                                    name="h_word")
+        if self.use_word_embedding:
+            self.p_vec = tf.placeholder(dtype=tf.float32, shape=[None, self.seq_len, self.word_embedding_dim], 
+                                        name="p_word")
+            self.h_vec = tf.placeholder(dtype=tf.float32, shape=[None, self.seq_len, self.word_embedding_dim], 
+                                        name="h_word")
         self.y = tf.placeholder(dtype=tf.int32, shape=[None], name="y")
 
         self.keep_prob = tf.placeholder(dtype=tf.float32, shape=None, name="keep_prob")
@@ -97,9 +108,13 @@ class Bimpm(object):
 
         p_output, _ = self.lstm(p_char_embedding, scope="lstm_p")
         h_output, _ = self.lstm(h_char_embedding, scope="lstm_h")
+        if self.use_word_embedding:
         ## concat char_embedding & word_embedding
-        p_embedding = tf.concat([self.p_vec, p_output], axis=-1)
-        h_embedding = tf.concat([self.h_vec, h_output], axis=-1)
+            p_embedding = tf.concat([self.p_vec, p_output], axis=-1)
+            h_embedding = tf.concat([self.h_vec, h_output], axis=-1)
+        else:
+            p_embedding = p_output
+            h_embedding = h_output
         p_embedding = self.dropout(p_embedding)
         h_embedding = self.dropout(h_embedding)
 
