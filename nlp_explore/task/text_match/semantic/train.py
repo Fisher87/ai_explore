@@ -41,14 +41,15 @@ class_size = 2
 embedding_dim=128
 random_embedding=True
 hidden_units = 128
-learning_rate=0.001
-batch_size = 1024
+learning_rate=0.0005
+batch_size = 1000
 epochs = 50
 
-model = DSSM(sequence_length, vocab_size)()
 
-# with tf.Graph().as_default():
-with tf.Session() as sess:
+with tf.Graph().as_default():
+    model = DSSM(sequence_length, vocab_size)()
+    config=tf.ConfigProto(log_device_placement=True)
+    sess = tf.Session(config=config)
 
     # define training procedure
     # grads_and_vars = model.optimier.compute_gradients(model.loss)
@@ -102,9 +103,10 @@ with tf.Session() as sess:
                                        model.acc, 
                                        model.global_step], 
                                        feed_dict)
-        time_str = datetime.datetime.now().isoformat()
-        avg_loss = np.sum(loss)/len(train_q)
-        print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, avg_loss, acc))
+        if step % 100==0:
+            time_str = datetime.datetime.now().isoformat()
+            print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, acc))
+
         return loss
 
     def evaluate(eval_q, eval_h, eval_y):
@@ -118,9 +120,9 @@ with tf.Session() as sess:
                                     model.acc, 
                                     model.global_step], 
                                     feed_dict)
-        avg_loss = np.sum(loss)/len(eval_q)
         time_str = datetime.datetime.now().isoformat()
-        print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, avg_loss, acc))
+        print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, acc))
+
         return loss
 
     batches = data_handler.batch_iter(list(zip(train_p, train_h, train_y)), 
@@ -130,13 +132,13 @@ with tf.Session() as sess:
     eval_losses  = []
     best_loss    = 10000
     last_improvement = 0
-    for batch in batches:
+    for i, batch in enumerate(batches):
         train_q_batch, train_h_batch, train_y_batch = zip(*batch)
         train_loss = train(train_q_batch, train_h_batch, train_y_batch)
         current_step = tf.train.global_step(sess, model.global_step)
 
         # evaluation step
-        if current_step % 10000==0:
+        if current_step % 100==0:
             print("\n Evaluation:")
             eval_loss = evaluate(dev_p, dev_h, dev_y)
             if eval_loss < best_loss:
@@ -146,7 +148,7 @@ with tf.Session() as sess:
                 last_improvement += 1
 
         # save checkpoint
-        if current_step % 10000 == 0:
+        if current_step % 100==0:
             path = saver.save(sess, checkpoint_prefix, global_step=current_step)
             print("saved model checkpoint to {}\n".format(path))
     

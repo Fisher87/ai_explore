@@ -65,7 +65,8 @@ class DSSM(object):
             # numclasses is 2.
         with tf.name_scope("output"):
             y = tf.one_hot(self.y, self.class_size)
-            self.loss = tf.nn.softmax_cross_entropy_with_logits(labels=y, logits=self.logits)
+            loss = tf.nn.softmax_cross_entropy_with_logits(labels=y, logits=self.logits)
+            self.loss = tf.reduce_mean(loss)
             self.optimier = tf.train.AdamOptimizer(self.learning_rate)
             self.train_op = self.optimier.minimize(self.loss, global_step=self.global_step)
             self.predictions = tf.argmax(self.logits, axis=1)
