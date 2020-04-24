@@ -1,8 +1,7 @@
 ## 代码主流程:
 
-`cli_main.cc:``
-
 ```c++
+cli_main.cc:
 main()
      -> CLIRunTask()
           -> CLITrain()
