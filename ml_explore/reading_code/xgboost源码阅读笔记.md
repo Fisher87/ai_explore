@@ -1,5 +1,5 @@
 ## 代码主流程:
-```
+```c++
 cli_main.cc:
 main()
      -> CLIRunTask()
