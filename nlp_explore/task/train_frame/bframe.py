@@ -32,10 +32,11 @@ class TrainBaseFrame(object):
         for g,v in grads_and_vars:
             if g is not None:
                 # gradient value
-                grad_hist_summary=tf.compat.v1.summary.histogram("{}/grad/hist".format(v.name),g)
+                grad_hist_summary=tf.compat.v1.summary.histogram("{}/grad/hist".format(v.name), g)
                 grad_summaries.append(grad_hist_summary)
                 # sparity
-                sparsity_summary =tf.compat.v1.summary.scalar('{}/grad/sparsity'.format(v.name),tf.nn.zero_fraction(g))
+                sparsity_summary =tf.compat.v1.summary.scalar('{}/grad/sparsity'.format(v.name),
+                                                              tf.nn.zero_fraction(g))
                 grad_summaries.append(sparsity_summary)
         grad_summaries_merged = tf.compat.v1.summary.merge(grad_summaries)
 
@@ -44,9 +45,11 @@ class TrainBaseFrame(object):
         accuracy_summary=tf.compat.v1.summary.scalar('accuracy', self.model.acc)
 
         # train summaries
-        self.train_summary_op = tf.compat.v1.summary.merge([loss_summary,accuracy_summary,grad_summaries_merged])
+        self.train_summary_op = tf.compat.v1.summary.merge([loss_summary,accuracy_summary,
+                                                            grad_summaries_merged])
         train_summary_dir=os.path.join(self.flags.out_dir,'summaries','train')
         self.train_summary_writer=tf.compat.v1.summary.FileWriter(train_summary_dir,sess.graph)
+
         # dev summaries
         self.dev_summary_op = tf.compat.v1.summary.merge([loss_summary, accuracy_summary])
         dev_summary_dir=os.path.join(self.flags.out_dir,'summaries','dev')
@@ -81,16 +84,16 @@ class TrainBaseFrame(object):
     def eval_step(self, session, feed_dict):
         if self.flags.summaries:
             steps, summaries, loss, acc = session.run([self.global_step,
-                                                          self.dev_summary_op,
-                                                          self.model.loss,
-                                                          self.model.acc], feed_dict=feed_dict)
+                                                       self.dev_summary_op,
+                                                       self.model.loss,
+                                                       self.model.acc], feed_dict=feed_dict)
             nowtime=datetime.datetime.now().isoformat()
             print('{}: step {}, loss {:g}, accuracy {:g}'.format(nowtime,steps,loss,acc))
             self.dev_summary_writer.add_summary(summaries,steps)
         else:
             steps, loss, acc = session.run([self.global_step,
-                                               self.model.loss,
-                                               self.model.acc], feed_dict=feed_dict)
+                                            self.model.loss,
+                                            self.model.acc], feed_dict=feed_dict)
             nowtime=datetime.datetime.now().isoformat()
             print('{}: step {}, loss {:g}, accuracy {:g}'.format(nowtime,steps,loss,acc))
 
