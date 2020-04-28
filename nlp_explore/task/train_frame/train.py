@@ -17,7 +17,8 @@ import tensorflow as tf
 from bframe import TrainBaseFrame
 from data_process.data_processor import batch_iter
 from data_process.data_processor import DataProcessor
-from flags import FLAGS
+from tflags import TFlags
+
 
 # classify task model
 from classify.textcnn import TextCNN 
@@ -29,6 +30,8 @@ argparser.add_argument("-t", "--task", default="classify",
 argparser.add_argument("-m", "--model", default="textcnn",
                        help="model type")
 args = argparser.parse_args()
+
+FLAGS = TFlags(args.task, args.model).FLAGS
 
 class Train(TrainBaseFrame):
     def __init__(self, model, flags, sess_config):
@@ -92,11 +95,11 @@ with tf.Graph().as_default():
                             FLAGS.random_embedding,
                             FLAGS.l2_reg_lambda)
         elif args.task == 'classify' and args.model=='bilstm_attention':
-            model = BiLSTM_Attention(FLAGS.pad_seq_len,
+            model = BiLSTM_Attention(FLAGS.seq_len,
                                     len(data_processor.char2idx),
                                     FLAGS.embedding_dim,
-                                    128,
-                                    64,
+                                    FLAGS.hidden_size,
+                                    FLAGS.attention_size,
                                     FLAGS.num_classes,
                                     FLAGS.learning_rate,
                                     )
