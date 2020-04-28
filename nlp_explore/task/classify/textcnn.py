@@ -31,6 +31,7 @@ class TextCNN(object):
         self.input_x = tf.compat.v1.placeholder(tf.int32, [None, sequence_length], name="input_x")
         self.input_y = tf.compat.v1.placeholder(tf.float32, [None, num_classes], name="input_y")
         self.dropout_keep_prob = tf.compat.v1.placeholder(tf.float32, name="dropout_keep_prob")
+        self.learning_rate = learning_rate
 
         # l2 regularization loss
         l2_loss = tf.constant(0.0)
@@ -85,17 +86,24 @@ class TextCNN(object):
             w = tf.compat.v1.get_variable("w", shape=[num_filters_total, num_classes], 
                                 initializer=tf.contrib.layers.xavier_initializer())
             b = tf.Variable(tf.truncated_normal([num_classes]), name="b")
+            # b = tf.Variable(tf.constant(0.1, shape=[num_classes]), name="b")
             l2_loss = tf.nn.l2_loss(w)
             l2_loss += tf.nn.l2_loss(b)
-            self.logits = tf.matmul(self.h_dropout, w) + b # self.scores = tf.nn.xw_plus_b(self.h_dropout, w, b, name="logits")
+            self.logits = tf.matmul(self.h_dropout, w) + b 
+            # self.logits = tf.nn.xw_plus_b(self.h_dropout, w, b, name="logits")
             self.predictions = tf.argmax(self.logits, 1, name="prediction")
 
         # loss
         with tf.name_scope("loss"):
             losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.logits, labels=self.input_y)
             self.loss = tf.reduce_mean(losses) + l2_lambda * l2_loss
+        self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
+        self.grads_and_vars = self.optimizer.compute_gradients(self.loss)
+        # self.train_op = self.optimizer.minimize(self.loss)
+        # self.train_op = self.optimizer.apply_gradients(self.grads_and_vars, 
+                                                       # global_step=self.global_step)
 
         # accuracy
         with tf.name_scope("accuracy"):
             self.correct_pred = tf.equal(self.predictions, tf.argmax(self.input_y, 1))
-            self.accuracy = tf.reduce_mean(tf.cast(self.correct_pred, "float"), name="accuracy")
+            self.acc = tf.reduce_mean(tf.cast(self.correct_pred, "float"), name="accuracy")
