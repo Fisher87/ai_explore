@@ -55,3 +55,15 @@ with tf.Session() as sess:
     print(_l)
 
 
+def batch_norm(inputs, hidden_size, training=True, scope="bn"):
+    with variable_scope(scope):
+        fc = tf.layers.dense(inputs, hidden_size)
+        fc = tf.layers.batch_normalzation(fc, training=training)
+        fc = tf.nn.relu(fc)
+
+        #...
+
+        # 用于更新moving_mean和moving_variance 
+        with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
+            train_op = tf.train.AdamOptimizer(learning_rate).minimize(loss)
+

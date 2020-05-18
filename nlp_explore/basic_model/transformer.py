@@ -12,10 +12,10 @@
 
 import tensorflow as tf
 
-def positionL_encoding(inputs, maxlen):
+def position_encoding(inputs, maxlen):
     E = inputs.get_shape().as_list()[-1]
     N, T = tf.shape(inputs)[0], tf.shape(inputs)[1]
-    with tf.variable_scope("positionL_encoding"):
+    with tf.variable_scope("position_encoding"):
         position_ind = tf.tile(tf.expand_dims(tf.range(T), 0), [N, 1])
 
         position_enc = np.array([
@@ -104,6 +104,17 @@ def multihead_attention(queries, keys, values, key_masks,
 
     return outputs
 
+def ff(inputs, num_units, scope='ff'):
+    with tf.variable_scope(scope, reuse=tf.AUTO_REUSE):
+        outputs = tf.layers.dense(inputs, num_units[0], activation=tf.nn.relu)
+        outputs = tf.layers.dense(outputs, num_units[1])
+        # residual connection
+        outputs += inputs
+        outputs = ln(outputs)
+
+    return outputs
+
+
 class Transformer(object):
     def __init__(self, config, vocab2id, id2vocab, embeddings):
         self.config = config
@@ -122,7 +133,7 @@ class Transformer(object):
             enc = tf.nn.embedding_lookup(self.embeddings, x)
             enc *= enc.get_shape().as_list()[-1] ** 0.5
 
-            enc += positionL_encoding(enc, self.config.maxlen)
+            enc += position_encoding(enc, self.config.maxlen)
             enc = tf.layers.dropout(enc, self.config.dropout_rate, training=training)
 
             for i in range(self.config.num_blocks):
@@ -131,4 +142,67 @@ class Transformer(object):
                     enc = multihead_attention(queries=enc,
                                               keys=enc,
                                               values=enc,
-                                              key_masks=src_masks)
+                                              key_masks=src_masks,
+                                              num_heads=self.config.num_heads,
+                                              dropout_rate=self.config.dropout_rate,
+                                              training=training,
+                                              causality=False)
+
+                    # ff
+                    enc = ff(enc, num_units=[self.config.d_ff, enc.get_shape().as_list()[-1]])
+        memory = enc
+        return memory, sents1, src_masks
+
+    def decode(self, ys, memory, src_masks, training=True):
+        '''
+        memory: encoder outputs.
+        '''
+        with tf.variable_scope('decoder', reuse=tf.AUTO_REUSE):
+            decoder_inputs, y, seqlens, sents2 = ys
+
+            # target mask
+            tgt_masks = tf.math.equal(decoder_inputs, 0)
+
+            # embedding
+            dec = tf.nn.embedding_lookup(self.embeddings, decoder_inputs)
+            dec *= dec.get_shape().as_list()[-1] ** 0.5 
+
+            dec += position_encoding(dec, maxlen=self.config.maxlen)
+            dec = tf.layers.dropout(dec, self.config.dropout_rate, training=training)
+
+            # blocks
+            for i in range(self.config.num_blocks):
+                with tf.variable_scope('num_blocks_{}'.format(i), reuse=tf.AUTO_REUSE):
+                    # self attention
+                    dec = multihead_attention(queries=dec,
+                                              keys=dec,
+                                              values=dec,
+                                              key_masks=tgt_masks,#用哪个values就用其对应的masks
+                                              num_heads=self.config.num_heads,
+                                              dropout_rate=self.config.dropout_rate,
+                                              training=training,
+                                              causality=True,
+                                              scope='decoder_self_attention')
+
+                    # vanilla attention
+                    dec = multihead_attention(queries=dec,
+                                              keys=memory,
+                                              values=memory,
+                                              key_masks=src_masks,
+                                              num_heads=self.config.num_heads,
+                                              dropout_rate=self.config.dropout_rate,
+                                              training=training,
+                                              causality=False,
+                                              scope='decoder_vanilla_attention')
+
+                    # ff
+                    dec = ff(dec, num_units=[self.config.d_ff, dec.get_shape().as_list()[-1]])
+
+            # linear projection
+            weights = tf.transpose(self.embeddings)
+            logits = tf.einsum('ntd,dk->ntk', dec, weights)
+            y_hat = tf.to_int32(tf.argmax(logits, axis=-1))
+
+            return logits, y_hat, y, sents2
+
+

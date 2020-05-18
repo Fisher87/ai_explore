@@ -8,3 +8,5 @@
 
 [3.详解《XGBoost: A Scalable Tree Boosting System》](https://zhuanlan.zhihu.com/p/89546007)
 
+[4.深入理解XGBoost](https://mp.weixin.qq.com/s/lfd7gHGmyY8-cqSnkauc6Q)
+
