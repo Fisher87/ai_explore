@@ -169,3 +169,7 @@ class TrainBaseFrame(object):
         feed_dict = self.get_feed_dict(test_data)
         print('\nTest Finally!')
         self.eval_step(sess, feed_dict)
+
+    def infer(self, sess, infer_data):
+        # TODO
+        pass

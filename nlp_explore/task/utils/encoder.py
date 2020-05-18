@@ -41,6 +41,31 @@ def lstm_encoder(inputs, lengths, state_size, keep_prob, scope='lstm-encoder', r
         )
         return output_state.h
 
+def multi_lstm_layer_encoder(inputs, lengths, state_size, num_layers,
+                             keep_prob, scope='multi_lstm_layer_encode',
+                             reuse=False):
+    """
+    Multi LSTM layer encoder
+    """
+    def single_lstm_cell(state_size, keep_prob, reuse=False):
+        single_cell = tf.contrib.rnn.core_rnn_cell.DropoutWrapper(
+            tf.contrib.rnn.core_rnn_cell.LSTMCell(
+                state_size,
+                reuse=reuse
+            ),
+            output_keep_prob=keep_prob
+        )
+        return single_cell
+    cell = tf.contrib.rnn.MultiRNNCell(
+        [single_lstm_cell(state_size, keep_prob) for _ in range(num_layers)])
+
+    outputs, output_state = tf.nn.dynamic_rnn(
+            inputs=inputs,
+            cell=cell_fw,
+            sequence_length=lengths,
+            dtype=tf.float32
+        )
+    return output_state
 
 def bidirectional_lstm_encoder(inputs, lengths, state_size, keep_prob, scope='bi-lstm-encoder', reuse=False):
     """
