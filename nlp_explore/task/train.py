@@ -9,14 +9,15 @@
 #   描    述：
 #
 #================================================================
+import pdb
 
 import argparse
 import numpy as np
 import tensorflow as tf
 
-from bframe import TrainBaseFrame
-from data_process.data_processor import batch_iter
-from data_process.data_processor import DataProcessor
+from train_frame.bframe import TrainBaseFrame
+from train_frame.data_process.data_processor import batch_iter
+from train_frame.data_process.data_processor import DataProcessor
 from tflags import TFlags
 
 
@@ -70,6 +71,8 @@ class Train(TrainBaseFrame):
 
 # data processor
 data_processor = DataProcessor(FLAGS.data_path, 
+                               ftype=2,
+                               maxlen=25,
                                vpath=FLAGS.vocab_path,
                                slabel='\t')
 data_processor.load_data()
@@ -78,8 +81,9 @@ data_processor.load_data()
 #               'eval' :['x', 'y'], 
 #               'test' :['x', 'y']}
 splited_data = data_processor.data_split(eval=0.1, test=0.1)
+# print(splited_data)
 train_data = splited_data['train']
-eval_data   = splited_data['eval']
+eval_data  = splited_data['eval']
 test_data  = splited_data['test']
 
 # init trainer
@@ -116,8 +120,8 @@ with tf.Graph().as_default():
         elif args.task == "chatbot":
             if args.model == "seq2seq_att":
                 word2inx = data_processor.char2idx
-                word2inx['GO'] = len(word2inx) + 1
-                word2inx['EOS']= len(word2inx) + 1
+                word2inx['<GO>'] = len(word2inx) + 1
+                word2inx['<EOS>']= len(word2inx) + 1
                 model = Seq2SeqWithAtt(FLAGS.max_len,
                                        len(word2inx),  # FLAGS.vocab_size,
                                        word2inx,       # FLAGS.word2inx,
@@ -131,4 +135,4 @@ with tf.Graph().as_default():
                                        )
 
         trainer = Train(model, FLAGS, sess_config)
-        # trainer.train(sess, train_data, eval_data, test_data)
+        trainer.train(sess, train_data, eval_data, test_data)

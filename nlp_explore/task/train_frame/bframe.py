@@ -14,7 +14,7 @@ import os
 import datetime
 import tensorflow as tf
 
-from data_process.data_processor import batch_iter 
+from .data_process.data_processor import batch_iter 
 
 class TrainBaseFrame(object):
     def __init__(self, model, flags, sess_config):

@@ -12,15 +12,17 @@
 
 import tensorflow as tf
 
-data_fpath = "./data/data.csv"
+data_fpath = "./data/%s/data.csv"
 vocab_fpath = "./data/vocab.txt"
 metadata_fpath = ""
-out_dir = "./result/{0}"
+out_dir = "./result/%s"
 
 class TFlags(object):
     def __init__(self, task, model):
         # system flags
-        tf.flags.DEFINE_string("data_path", data_fpath, "data source file path.")
+        tf.flags.DEFINE_string("task", task, "task name")
+        tf.flags.DEFINE_string("model", model, "model name")
+        tf.flags.DEFINE_string("data_path", data_fpath %(task), "data source file path.")
         tf.flags.DEFINE_string("vocab_path", vocab_fpath, "vocab data source file path.")
         tf.flags.DEFINE_string("metadata_path", metadata_fpath, "metadata file for embedding visualization"
                                                         "(each line is a word segment in metadata_file).")
@@ -34,7 +36,7 @@ class TFlags(object):
         tf.flags.DEFINE_integer("decay_steps", 5000, "how many steps before decay learning rate. (default: 500)")
         tf.flags.DEFINE_float("decay_rate", 0.95, "rate of decay for learning rate. (default: 0.95)")
         tf.flags.DEFINE_integer("checkpoint_every", 10, "save model after this many steps (default: 1000)")
-        tf.flags.DEFINE_string("out_dir", out_dir.format(task), "save training data (like:model, checkpoint, summaries) path")
+        tf.flags.DEFINE_string("out_dir", out_dir %(task), "save training data (like:model, checkpoint, summaries) path")
         tf.flags.DEFINE_integer("num_checkpoints", 10, "number of checkpoints to store (default: 50)")
         tf.flags.DEFINE_integer("early_stopping_span", 25, "number of steps span that eval loss not descend (default: 25)")
 
@@ -78,14 +80,15 @@ class TFlags(object):
 
         elif task=='chatbot':
             if model=="seq2seq_att":
-                tf.flags.DEFINE_integer("max_len", 100, "padding seq length of data.")
-                tf.flags.DEFINE_integer("embedding_dim", 128, "deminsionality of embedding size. (default: 128)")
+                tf.flags.DEFINE_integer("max_len", 25, "padding seq length of data.")
+                tf.flags.DEFINE_integer("embedding_dim", 125, "deminsionality of embedding size. (default: 128)")
                 tf.flags.DEFINE_integer("state_size", 128, "lstm hidden layer units. (default: 128)")
                 tf.flags.DEFINE_float("learning_rate", 0.001, "the learning rate. (default: 0.001)")
                 tf.flags.DEFINE_integer("num_layers", 2, "lstm layers. (default: 2)")
                 tf.flags.DEFINE_integer("beam_width", 4, "beam search top k. (default: 5)")
                 tf.flags.DEFINE_boolean("use_attention", True, "wheather to use attention. (default: True)")
                 tf.flags.DEFINE_boolean("use_teacher_forcing", True, "use teacher forcing type helper. (default: True)")
+                tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "dropout keep probability (default: 0.5)")
 
     @property
     def FLAGS(self):
