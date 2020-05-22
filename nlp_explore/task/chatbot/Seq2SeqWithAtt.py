@@ -60,8 +60,8 @@ class Seq2SeqWithAtt(object):
         return outputs, output_state
 
     def build_graph(self):
-        self.input_x = tf.placeholder(tf.int32, shape=[None, self.max_len], name='input_x') 
-        self.input_y = tf.placeholder(tf.int32, shape=[None, self.max_len], name="input_y")
+        self.input_x = tf.placeholder(tf.int32, shape=[None, None], name='input_x') 
+        self.input_y = tf.placeholder(tf.int32, shape=[None, None], name="input_y")
         # self.x_len = tf.placeholder(tf.int32, shape=[None], name="x_len")
         # self.y_len = tf.placeholder(tf.int32, shape=[None], name="y_len")
         self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
@@ -135,7 +135,6 @@ class Seq2SeqWithAtt(object):
 
             # beam search decoder
             # beam_search_decoder_initial_state = decoder_cell.zero_state(tf.shape(self.input_y)[0] * self.beam_width, tf.float32)
-
             self.beam_search_decoder = tf.contrib.seq2seq.BeamSearchDecoder(
                                                                    cell = decoder_cell, 
                                                                    embedding = self.embedding_table, 
@@ -153,6 +152,7 @@ class Seq2SeqWithAtt(object):
             self.decoder_predict_decode = self.beam_search_decoder_outputs.predicted_ids
 
         sequence_mask = tf.sequence_mask(self.y_len, tf.reduce_max(self.y_len), dtype=tf.float32)
+        # sequence_mask = tf.sequence_mask(self.y_len, self.max_len, dtype=tf.float32)
         with tf.variable_scope('loss'):
             outputs = decoder_outputs.rnn_output
             # self.decoder_logits = tf.layers.dense(outputs, self.vocab_size)

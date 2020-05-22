@@ -120,7 +120,8 @@ class DataProcessor(object):
                     for seq in seqs:
                         # <UNK> : 1 
                         seq2id = [self.char2idx.get(c, 1) for c in seq]
-                        seq2id = padding(seq2id, maxlen=self.maxlen)
+                        if self.padding:
+                            seq2id = padding(seq2id, maxlen=self.maxlen)
                         seq2ids.append(np.array(seq2id))
                 self.doc2ids[f] = np.array(seq2ids)
         elif self.ftype==2:
@@ -129,13 +130,15 @@ class DataProcessor(object):
                 if f=="s2" and self.s2_label:
                     for seq in seqs:
                         seq2id = [self.s2_label_dict[seq.strip()] for c in seq]
-                        seq2id = padding(seq2id, maxlen=self.maxlen)
+                        if self.padding:
+                            seq2id = padding(seq2id, maxlen=self.maxlen)
                         seq2ids.append(np.array(seq2id))
                 else:
                     for seq in seqs:
                         # <UNK> : 1 
                         seq2id = [self.char2idx.get(c, 1) for c in seq]
-                        seq2id = padding(seq2id, maxlen=self.maxlen)
+                        if self.padding:
+                            seq2id = padding(seq2id, maxlen=self.maxlen)
                         seq2ids.append(np.array(seq2id))
                 self.doc2ids[f] = np.array(seq2ids)
 
@@ -199,7 +202,7 @@ class DataProcessor(object):
             
         return self.split_data
 
-def batch_iter(data, batch_size, epoch_num, shuffle=True):
+def batch_iter(data, batch_size, epoch_num, padding=True, shuffle=True):
     '''generate a batch iterator for dataset;
     '''
     data = np.array(data)

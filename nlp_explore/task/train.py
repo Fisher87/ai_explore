@@ -52,16 +52,36 @@ class Train(TrainBaseFrame):
         batches = batch_iter(data, batch_size, num_epochs, shuffle=shuffle)
         return batches
 
-    def get_feed_dict(self, batch_data, is_training=False):
+    def get_feed_dict(self, batch_data, 
+                      is_training=False, 
+                      padding=True, 
+                      samelen=False):
+        '''
+        @param: padding, whether to padding data in batch; If sequence data 
+                length in batch is not same when do feed feed_dict will throw error;
+        @param: samelen, whether `x`, 'y' padding to same length;
+        '''
         if is_training:
             x_batch, y_batch = zip(*batch_data)
+        else:
+            x_batch, y_batch = batch_data[0], batch_data[1]
+        if padding:
+            x_maxlen = max([len(x) for x in x_batch])
+            y_maxlen = max([len(y) for y in y_batch])
+            if samelen:
+                x_maxlen = y_maxlen = max(x_maxlen, y_maxlen)
+            _x_batch = [list(x)+[0]*(x_maxlen-len(x)) for x in x_batch]
+            _y_batch = [list(y)+[0]*(y_maxlen-len(y)) for y in y_batch]
+            x_batch = _x_batch
+            y_batch = _y_batch
+
+        if is_training:
             feed_dict = {
                     self.model.input_x : x_batch, 
                     self.model.input_y : y_batch,
                     self.model.dropout_keep_prob : self.flags.dropout_keep_prob
                         }
         else:
-            x_batch, y_batch = batch_data[0], batch_data[1]
             feed_dict = {
                     self.model.input_x : x_batch, 
                     self.model.input_y : y_batch,
@@ -74,6 +94,7 @@ class Train(TrainBaseFrame):
 data_processor = DataProcessor(FLAGS.data_path, 
                                ftype=2,
                                maxlen=25,
+                               padding=False,
                                vpath=FLAGS.vocab_path,
                                slabel='\t')
 data_processor.load_data()
@@ -82,7 +103,6 @@ data_processor.load_data()
 #               'eval' :['x', 'y'], 
 #               'test' :['x', 'y']}
 splited_data = data_processor.data_split(eval=0.1, test=0.1)
-# print(splited_data)
 train_data = splited_data['train']
 eval_data  = splited_data['eval']
 test_data  = splited_data['test']
@@ -92,7 +112,7 @@ sess_config = tf.compat.v1.ConfigProto(allow_soft_placement=True,
                                        log_device_placement=False)
 with tf.Graph().as_default():
     sess = tf.compat.v1.Session(config=sess_config)
-    sess = tfdbg.LocalCLIDebugWrapperSession(sess)
+    # sess = tfdbg.LocalCLIDebugWrapperSession(sess)
     with sess.as_default():
         # init model
         if args.task == 'classify':
