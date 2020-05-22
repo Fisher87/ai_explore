@@ -14,6 +14,7 @@ import pdb
 import argparse
 import numpy as np
 import tensorflow as tf
+from tensorflow.python import debug as tfdbg
 
 from train_frame.bframe import TrainBaseFrame
 from train_frame.data_process.data_processor import batch_iter
@@ -91,6 +92,7 @@ sess_config = tf.compat.v1.ConfigProto(allow_soft_placement=True,
                                        log_device_placement=False)
 with tf.Graph().as_default():
     sess = tf.compat.v1.Session(config=sess_config)
+    sess = tfdbg.LocalCLIDebugWrapperSession(sess)
     with sess.as_default():
         # init model
         if args.task == 'classify':

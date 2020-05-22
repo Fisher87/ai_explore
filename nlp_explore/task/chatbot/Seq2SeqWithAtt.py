@@ -113,7 +113,7 @@ class Seq2SeqWithAtt(object):
             decoder_input_embedding = tf.nn.embedding_lookup(self.embedding_table, decoder_inputs)
             # helper
             if self.use_teacher_forcing:
-                helper = tf.contrib.seq2seq.TrainingHelper(decoder_input_embedding, self.y_len)
+                helper = tf.contrib.seq2seq.TrainingHelper(decoder_input_embedding, self.y_len, time_major=False)
             else:
                 # GreedyEmbeddingHelper(embedding, start_tokens, end_token)
                 helper = tf.contrib.seq2seq.GreedyEmbeddingHelper(self.embedding_table, 
@@ -129,8 +129,9 @@ class Seq2SeqWithAtt(object):
 
             decoder = tf.contrib.seq2seq.BasicDecoder(decoder_cell, helper, decoder_initial_state, 
                                                       output_layer=output_layer)
-            decoder_outputs, decoder_state, final_sequence_lengths = tf.contrib.seq2seq.dynamic_decode(decoder, 
-                                                                 maximum_iterations=tf.reduce_max(self.y_len))
+            decoder_outputs, decoder_state, final_sequence_lengths = \
+                            tf.contrib.seq2seq.dynamic_decode(decoder, impute_finished=True,
+                                                         maximum_iterations=tf.reduce_max(self.y_len))
 
             # beam search decoder
             # beam_search_decoder_initial_state = decoder_cell.zero_state(tf.shape(self.input_y)[0] * self.beam_width, tf.float32)
