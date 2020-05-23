@@ -48,7 +48,7 @@ class TFlags(object):
         # task model parameters
         if task=='classify':
             if model=='textcnn':
-                tf.flags.DEFINE_integer("pad_seq_len", 100, "padding seq length of data.")
+                tf.flags.DEFINE_integer("seq_len", 100, "padding seq length of data.")
                 tf.flags.DEFINE_integer("embedding_dim", 100, "deminsionality of embedding size. (default: 128)")
                 tf.flags.DEFINE_float("learning_rate", 0.001, "the learning rate. (default: 0.001)")
                 tf.flags.DEFINE_string("filter_sizes", "3,4,5", "filter sizes. (default: 3,4,5)")
@@ -77,10 +77,10 @@ class TFlags(object):
 
         elif task=='text_match':
             if model == 'dssm':
-                tf.flags.DEFINE_integer("seq_len", 30, "padding seq length of data.")
+                tf.flags.DEFINE_integer("seq_len", 20, "padding seq length of data.")
                 tf.flags.DEFINE_integer("embedding_dim", 100, "deminsionality of embedding size. (default: 128)")
                 tf.flags.DEFINE_integer("hidden_size", 128, "lstm hidden layer units. (default: 128)")
-                tf.flags.DEFINE_float("learning_rate", 0.001, "the learning rate. (default: 0.001)")
+                tf.flags.DEFINE_float("learning_rate", 0.0005, "the learning rate. (default: 0.001)")
                 tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "dropout keep probability (default: 0.5)")
                 tf.flags.DEFINE_integer("num_classes", 2, "number of labels (depends on the task.)")
 

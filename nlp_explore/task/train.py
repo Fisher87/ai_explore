@@ -121,14 +121,14 @@ class Train(TrainBaseFrame):
 # chatbot data_processor
 if args.task == 'classify':
     data_processor = DataProcessor(FLAGS.data_path, 
-                                   maxlen=25,
+                                   maxlen=FLAGS.seq_len,
                                    vpath=FLAGS.vocab_path,
                                    slabel='\t')
 
 if args.task == 'text_match':
     data_processor = DataProcessor(FLAGS.data_path, 
                                    ftype=3,
-                                   maxlen=30,
+                                   maxlen=FLAGS.seq_len,
                                    vpath=FLAGS.vocab_path,
                                    slabel='\t')
 
@@ -160,7 +160,7 @@ with tf.Graph().as_default():
         # init model
         if args.task == 'classify':
             if args.model=='textcnn':
-                model = TextCNN(FLAGS.pad_seq_len,
+                model = TextCNN(FLAGS.seq_len,
                                 FLAGS.num_classes,
                                 len(data_processor.char2idx),
                                 FLAGS.embedding_dim,

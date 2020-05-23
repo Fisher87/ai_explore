@@ -76,7 +76,7 @@ class DataProcessor(object):
                 content = ''.join([l.strip().rsplit(self.label, 1)[0] for l in rf.readlines()])
             char_count = Counter(content)
             char_list = [c[0] for c in char_count.most_common(4000)]
-            char_list = ['<PAD>', '<UNK'] + char_list
+            char_list = ['<PAD>', '<UNK>'] + char_list
             self.char2idx = {c:idx for (c, idx) in enumerate(char_list)}
             self.idx2char = {idx:c for (c, idx) in enumerate(char_list)}
             # TODO
