@@ -22,10 +22,17 @@ from train_frame.data_process.data_processor import DataProcessor
 from tflags import TFlags
 
 
-# classify task model
+# 1. classify task model;
 from classify.textcnn import TextCNN 
 from classify.bilstm_attention import BiLSTM_Attention
-# chatbot
+
+# 2. text match task model;
+from text_match.semantic.DSSM import DSSM
+# from text_match.semantic.ESIM import ESIM
+# from text_match.semantic.BIMPM import BIMPM
+# from text_match.semantic.ABCnn import ABCnn
+
+# 3. chatbot/nlg task model;
 from chatbot.Seq2SeqWithAtt import Seq2SeqWithAtt
 
 argparser = argparse.ArgumentParser()
@@ -38,10 +45,11 @@ args = argparser.parse_args()
 FLAGS = TFlags(args.task, args.model).FLAGS
 
 class Train(TrainBaseFrame):
-    def __init__(self, model, flags, sess_config):
+    def __init__(self, model, flags, sess_config, field_len=2):
         super(Train, self).__init__(model, flags, sess_config)
         self.model = model
         self.flags = flags
+        self.field_len = field_len
         self.sess_config = sess_config
 
     def get_batches(self, train_data, batch_size, num_epochs, shuffle=True):
@@ -61,10 +69,19 @@ class Train(TrainBaseFrame):
                 length in batch is not same when do feed feed_dict will throw error;
         @param: samelen, whether `x`, 'y' padding to same length;
         '''
+        label_batch = None
         if is_training:
-            x_batch, y_batch = zip(*batch_data)
+            if self.field_len == 2:
+                x_batch, y_batch = zip(*batch_data)
+            elif self.field_len == 3:
+                x_batch, y_batch, label_batch = zip(*batch_data)
         else:
-            x_batch, y_batch = batch_data[0], batch_data[1]
+            if self.field_len == 2:
+                x_batch, y_batch = batch_data[0], batch_data[1]
+            elif self.field_len == 3:
+                x_batch, y_batch, label_batch  = \
+                        batch_data[0], batch_data[1], batch_data[2]
+
         if padding:
             x_maxlen = max([len(x) for x in x_batch])
             y_maxlen = max([len(y) for y in y_batch])
@@ -76,27 +93,52 @@ class Train(TrainBaseFrame):
             y_batch = _y_batch
 
         if is_training:
-            feed_dict = {
-                    self.model.input_x : x_batch, 
-                    self.model.input_y : y_batch,
-                    self.model.dropout_keep_prob : self.flags.dropout_keep_prob
-                        }
+            if not y_batch:
+                feed_dict = {
+                        self.model.input_x : x_batch, 
+                        self.model.input_y : y_batch,
+                        self.model.dropout_keep_prob : self.flags.dropout_keep_prob
+                            }
+            else:
+                feed_dict = {
+                        self.model.input_x : x_batch, 
+                        self.model.input_y : y_batch,
+                        self.model.label   : label_batch,
+                        self.model.dropout_keep_prob : self.flags.dropout_keep_prob
+                            }
+
         else:
             feed_dict = {
                     self.model.input_x : x_batch, 
                     self.model.input_y : y_batch,
+                    self.model.label   : label_batch,
                     self.model.dropout_keep_prob : 1.0
                 }
 
         return feed_dict
 
 # data processor
-data_processor = DataProcessor(FLAGS.data_path, 
-                               ftype=2,
-                               maxlen=25,
-                               padding=False,
-                               vpath=FLAGS.vocab_path,
-                               slabel='\t')
+# chatbot data_processor
+if args.task == 'classify':
+    data_processor = DataProcessor(FLAGS.data_path, 
+                                   maxlen=25,
+                                   vpath=FLAGS.vocab_path,
+                                   slabel='\t')
+
+if args.task == 'text_match':
+    data_processor = DataProcessor(FLAGS.data_path, 
+                                   ftype=3,
+                                   maxlen=30,
+                                   vpath=FLAGS.vocab_path,
+                                   slabel='\t')
+
+if args.task == 'chatbot':
+    data_processor = DataProcessor(FLAGS.data_path, 
+                                   ftype=2,
+                                   maxlen=25,
+                                   padding=False,
+                                   vpath=FLAGS.vocab_path,
+                                   slabel='\t')
 data_processor.load_data()
 
 ## split_data: {'train':['x', 'y'], 
@@ -106,6 +148,7 @@ splited_data = data_processor.data_split(eval=0.1, test=0.1)
 train_data = splited_data['train']
 eval_data  = splited_data['eval']
 test_data  = splited_data['test']
+field_len = len(train_data)
 
 # init trainer
 sess_config = tf.compat.v1.ConfigProto(allow_soft_placement=True,
@@ -133,11 +176,23 @@ with tf.Graph().as_default():
                                         FLAGS.hidden_size,
                                         FLAGS.attention_size,
                                         FLAGS.num_classes,
-                                        FLAGS.learning_rate,
-                                        )
+                                        FLAGS.learning_rate)
+
         elif args.task == "text_match":
-            if args.model == "":
-                pass
+            if args.model == "dssm":
+                model = DSSM(FLAGS.seq_len,
+                             len(data_processor.char2idx),
+                             FLAGS.num_classes,
+                             FLAGS.embedding_dim,
+                             FLAGS.random_embedding,
+                             FLAGS.hidden_size,
+                             FLAGS.learning_rate)
+            elif args.model == "esim":
+                model = ESIM()
+            elif args.model == 'bimpm':
+                model = BIMPM()
+            elif args.model == 'abcnn':
+                model = ABCnn()
 
         elif args.task == "chatbot":
             if args.model == "seq2seq_att":
@@ -156,5 +211,5 @@ with tf.Graph().as_default():
                                        FLAGS.beam_width
                                        )
 
-        trainer = Train(model, FLAGS, sess_config)
+        trainer = Train(model, FLAGS, sess_config, field_len=field_len)
         trainer.train(sess, train_data, eval_data, test_data)

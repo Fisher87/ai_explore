@@ -76,7 +76,13 @@ class TFlags(object):
             pass
 
         elif task=='text_match':
-            pass
+            if model == 'dssm':
+                tf.flags.DEFINE_integer("seq_len", 30, "padding seq length of data.")
+                tf.flags.DEFINE_integer("embedding_dim", 100, "deminsionality of embedding size. (default: 128)")
+                tf.flags.DEFINE_integer("hidden_size", 128, "lstm hidden layer units. (default: 128)")
+                tf.flags.DEFINE_float("learning_rate", 0.001, "the learning rate. (default: 0.001)")
+                tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "dropout keep probability (default: 0.5)")
+                tf.flags.DEFINE_integer("num_classes", 2, "number of labels (depends on the task.)")
 
         elif task=='chatbot':
             if model=="seq2seq_att":

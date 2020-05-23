@@ -29,14 +29,14 @@ class DSSM(object):
         self.random_embedding = random_embedding
         self.hidden_units = hidden_units
         self.learning_rate = learning_rate
+        self.build_graph()
 
-    def __call__(self):
-        self.query = tf.placeholder(dtype=tf.int32, shape=[None, self.sequence_length], name="query")
-        self.doc = tf.placeholder(dtype=tf.int32, shape=[None, self.sequence_length], name="doc")
-        self.y = tf.placeholder(dtype=tf.int32, shape=[None], name="y")
+    def build_graph(self):
+        self.input_x = tf.placeholder(dtype=tf.int32, shape=[None, self.sequence_length], name="input_x")
+        self.input_y = tf.placeholder(dtype=tf.int32, shape=[None, self.sequence_length], name="input_y")
+        self.label  = tf.placeholder(dtype=tf.int32, shape=[None, self.class_size], name="label")
 
-        self.keep_prob = tf.placeholder(dtype=tf.float32, name="keep_prob")
-        self.global_step = tf.Variable(0, name="global_step", trainable=False)
+        self.dropout_keep_prob = tf.placeholder(dtype=tf.float32, name="dropout_keep_prob")
         # embedding layer
         with tf.device('/cpu:0'), tf.name_scope("embedding"):
             if self.random_embedding:
@@ -49,8 +49,8 @@ class DSSM(object):
                 # TODO
                 self.embedding_table = load_embedding()
 
-            self.q_embedding = tf.nn.embedding_lookup(self.embedding_table, self.query)
-            self.d_embedding = tf.nn.embedding_lookup(self.embedding_table, self.doc)
+            self.q_embedding = tf.nn.embedding_lookup(self.embedding_table, self.input_x)
+            self.d_embedding = tf.nn.embedding_lookup(self.embedding_table, self.input_y)
 
         # feature extract layer. DSSM using 3 fc layers.
         with tf.name_scope("fc_layer"):
@@ -64,19 +64,19 @@ class DSSM(object):
             
             # numclasses is 2.
         with tf.name_scope("output"):
-            y = tf.one_hot(self.y, self.class_size)
-            loss = tf.nn.softmax_cross_entropy_with_logits(labels=y, logits=self.logits)
+            # y = tf.one_hot(self.label, self.class_size)
+            loss = tf.nn.softmax_cross_entropy_with_logits(labels=self.label, logits=self.logits)
             self.loss = tf.reduce_mean(loss)
             self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
-            self.train_op = self.optimizer.minimize(self.loss, global_step=self.global_step)
+            # self.train_op = self.optimizer.minimize(self.loss)
+            self.grads_and_vars = self.optimizer.compute_gradients(self.loss)
             self.predictions = tf.argmax(self.logits, axis=1)
-            self.correct_pred = tf.equal(tf.cast(self.predictions, tf.int32), self.y)
+            self.correct_pred = tf.equal(tf.cast(self.predictions, tf.int32), 
+                                         tf.cast(tf.argmax(self.label, axis=1), tf.int32))
             self.acc = tf.reduce_mean(tf.cast(self.correct_pred, tf.float32))
 
-        return self
-            
     def dropout(self, x):
-        return tf.nn.dropout(x, keep_prob=self.keep_prob)
+        return tf.nn.dropout(x, keep_prob=self.dropout_keep_prob)
 
     def fc(self, x):
         """
