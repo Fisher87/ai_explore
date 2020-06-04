@@ -149,7 +149,9 @@ class Seq2SeqWithAtt(object):
             self.beam_search_final_sequence_lengths = tf.contrib.seq2seq.dynamic_decode(self.beam_search_decoder, 
                                                                                         maximum_iterations=     \
                                                                                         tf.reduce_max(self.x_len))
-            self.decoder_predict_decode = self.beam_search_decoder_outputs.predicted_ids
+            # beamsearch decoder predict
+            # self.decoder_predict_decode = self.beam_search_decoder_outputs.predicted_ids
+            self.predictions = self.beam_search_decoder_outputs.predicted_ids
 
         sequence_mask = tf.sequence_mask(self.y_len, tf.reduce_max(self.y_len), dtype=tf.float32)
         # sequence_mask = tf.sequence_mask(self.y_len, self.max_len, dtype=tf.float32)
@@ -164,12 +166,14 @@ class Seq2SeqWithAtt(object):
 
         y_t = tf.argmax(outputs, axis=2)
         y_t = tf.cast(y_t, tf.int32)
-        self.predictions = tf.boolean_mask(y_t, sequence_mask)
+        # train predictions
+        self.t_predictions = tf.boolean_mask(y_t, sequence_mask)
         self.mask_label = tf.boolean_mask(self.input_y, sequence_mask)
         self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
         self.grads_and_vars = self.optimizer.compute_gradients(self.loss)
 
         with tf.name_scope("accuracy"):
-            self.correct_pred = tf.equal(self.predictions, self.mask_label)
+            self.correct_pred = tf.equal(self.t_predictions, self.mask_label)
             self.correct_index= tf.cast(self.correct_pred, tf.float32)
             self.acc = tf.reduce_mean(tf.cast(self.correct_pred, "float"), name="accuracy")
+

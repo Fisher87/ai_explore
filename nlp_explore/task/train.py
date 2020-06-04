@@ -60,10 +60,7 @@ class Train(TrainBaseFrame):
         batches = batch_iter(data, batch_size, num_epochs, shuffle=shuffle)
         return batches
 
-    def get_feed_dict(self, batch_data, 
-                      is_training=False, 
-                      padding=True, 
-                      samelen=False):
+    def get_feed_dict(self, batch_data, is_training=False, padding=True, samelen=False):
         '''
         @param: padding, whether to padding data in batch; If sequence data 
                 length in batch is not same when do feed feed_dict will throw error;
@@ -93,7 +90,7 @@ class Train(TrainBaseFrame):
             y_batch = _y_batch
 
         if is_training:
-            if not y_batch:
+            if not label_batch:
                 feed_dict = {
                         self.model.input_x : x_batch, 
                         self.model.input_y : y_batch,
@@ -108,11 +105,18 @@ class Train(TrainBaseFrame):
                             }
 
         else:
-            feed_dict = {
-                    self.model.input_x : x_batch, 
-                    self.model.input_y : y_batch,
-                    self.model.label   : label_batch,
-                    self.model.dropout_keep_prob : 1.0
+            if not label_batch:
+                feed_dict = {
+                        self.model.input_x : x_batch, 
+                        self.model.input_y : y_batch,
+                        self.model.dropout_keep_prob : 1.0
+                    }
+            else:
+                feed_dict = {
+                        self.model.input_x : x_batch, 
+                        self.model.input_y : y_batch,
+                        self.model.label   : label_batch,
+                        self.model.dropout_keep_prob : 1.0
                 }
 
         return feed_dict

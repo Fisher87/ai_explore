@@ -98,6 +98,10 @@ class TrainBaseFrame(object):
             print('{}: step {}, loss {:g}, accuracy {:g}'.format(nowtime,steps,loss,acc))
 
         return loss
+
+    def infer_step(self, session, feed_dict):
+        predictions = session.run([self.model.predictions], feed_dict=feed_dict)
+        return predictions
         
     def early_stopping(self, current_loss):
         if current_loss < self.best_loss:
@@ -170,6 +174,12 @@ class TrainBaseFrame(object):
         print('\nTest Finally!')
         self.eval_step(sess, feed_dict)
 
-    def infer(self, sess, infer_data):
-        # TODO
-        pass
+    def infer(self, sess, infer_data, is_training=False):
+        predictions = []
+        batches = self.get_batches(infer_data, self.flags.batch_size) 
+        for batch in batches:
+            feed_dict = self.get_feed_dict(batch, is_training=is_training)
+            _predictions = self.infer_step(sess, feed_dict)
+            predictions.append(_predictions)
+
+        return predictions

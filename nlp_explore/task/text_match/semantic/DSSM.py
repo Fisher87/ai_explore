@@ -31,6 +31,37 @@ class DSSM(object):
         self.learning_rate = learning_rate
         self.build_graph()
 
+    def dropout(self, x):
+        return tf.nn.dropout(x, keep_prob=self.dropout_keep_prob)
+
+    def fc(self, x):
+        """
+        fully connect layer
+        """
+        hidden_units = [256, 512, 128]
+        for h_u in hidden_units:
+            x = tf.layers.dense(x, h_u, activation="tanh")
+            x = self.dropout(x)
+
+        # prepare for compute cosine similarity.
+        x = tf.reshape(x, shape=[-1, x.shape[1]*x.shape[2]])
+
+        return x
+
+    def cosine(self, x1, x2):
+        """
+        cosine = y_qT * y_d / ||y_q||*||y_d||
+
+        refer: 
+            https://stackoverflow.com/questions/43357732/how-to-calculate-the-cosine-similarity-between-two-tensors
+        """
+        x1_norm = tf.norm(x1, axis=1, keepdims=True)
+        x2_norm = tf.norm(x2, axis=1, keepdims=True)
+        cosine = tf.reduce_sum(tf.multiply(x1, x2), axis=1, keepdims=True) \
+                                    / (x1_norm * x2_norm)
+
+        return cosine
+
     def build_graph(self):
         self.input_x = tf.placeholder(dtype=tf.int32, shape=[None, self.sequence_length], name="input_x")
         self.input_y = tf.placeholder(dtype=tf.int32, shape=[None, self.sequence_length], name="input_y")
@@ -74,36 +105,5 @@ class DSSM(object):
             self.correct_pred = tf.equal(tf.cast(self.predictions, tf.int32), 
                                          tf.cast(tf.argmax(self.label, axis=1), tf.int32))
             self.acc = tf.reduce_mean(tf.cast(self.correct_pred, tf.float32))
-
-    def dropout(self, x):
-        return tf.nn.dropout(x, keep_prob=self.dropout_keep_prob)
-
-    def fc(self, x):
-        """
-        fully connect layer
-        """
-        hidden_units = [256, 512, 128]
-        for h_u in hidden_units:
-            x = tf.layers.dense(x, h_u, activation="tanh")
-            x = self.dropout(x)
-
-        # prepare for compute cosine similarity.
-        x = tf.reshape(x, shape=[-1, x.shape[1]*x.shape[2]])
-
-        return x
-
-    def cosine(self, x1, x2):
-        """
-        cosine = y_qT * y_d / ||y_q||*||y_d||
-
-        refer: 
-            https://stackoverflow.com/questions/43357732/how-to-calculate-the-cosine-similarity-between-two-tensors
-        """
-        x1_norm = tf.norm(x1, axis=1, keepdims=True)
-        x2_norm = tf.norm(x2, axis=1, keepdims=True)
-        cosine = tf.reduce_sum(tf.multiply(x1, x2), axis=1, keepdims=True) \
-                                    / (x1_norm * x2_norm)
-
-        return cosine
 
 
