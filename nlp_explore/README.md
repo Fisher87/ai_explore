@@ -18,7 +18,17 @@
 #### 预训练模型
 [1.NLP预训练语言模型总结](https://zhuanlan.zhihu.com/p/76912493)
 
+#### query分析
+[1.搜索中的 Query 理解及应用](https://mp.weixin.qq.com/s/TlzgztCcPdzwqrjCUrPRYw)
+
+[2.搜索中的Query扩展技术](https://mp.weixin.qq.com/s/WRVwKaWvY-j-bkjxCprckQ)
+
+[3.Query 理解和语义召回在知乎搜索中的应用](https://www.6aiq.com/article/1577969687897)
+
 #### 文本匹配
+
+#### 问答系统
+[1.一份问答系统的小结](https://zhuanlan.zhihu.com/p/35667773)
 
 #### 知识图谱
 [1.知识图谱的技术与应用](https://zhuanlan.zhihu.com/p/38056557)
