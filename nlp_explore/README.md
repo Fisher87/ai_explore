@@ -19,3 +19,8 @@
 [1.NLP预训练语言模型总结](https://zhuanlan.zhihu.com/p/76912493)
 
 #### 文本匹配
+
+#### 知识图谱
+[1.知识图谱的技术与应用](https://zhuanlan.zhihu.com/p/38056557)
+
+[2.知识图谱实体链接](https://mp.weixin.qq.com/s/vtj1HgDC2slsOw9DGoURCA)
