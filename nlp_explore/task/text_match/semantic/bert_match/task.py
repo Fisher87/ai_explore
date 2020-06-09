@@ -17,7 +17,7 @@ class TextMatchTask(object):
                bert_model, 
                labels,
                num_labels,
-               is_traing=True,
+               is_training=True,
                keep_prob=0.9
                ):
     # In the demo, we are doing a simple classification task on the entire
@@ -49,5 +49,5 @@ class TextMatchTask(object):
       one_hot_labels = tf.one_hot(labels, depth=num_labels, dtype=tf.float32)
 
       self.per_example_loss = -tf.reduce_sum(one_hot_labels * log_probs, axis=-1)
-      self.loss = tf.reduce_mean(per_example_loss)
+      self.loss = tf.reduce_mean(self.per_example_loss)
 

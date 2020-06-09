@@ -343,7 +343,7 @@ def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
   text_match_task = TextMatchTask(model, 
                                   labels, 
                                   num_labels, 
-                                  is_traing=is_traing)
+                                  is_training=is_training)
 
   return (text_match_task.loss, 
           text_match_task.per_example_loss, 

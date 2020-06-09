@@ -9,6 +9,9 @@
 #   描    述：
 #
 #================================================================
+import os
+
+import tokenization
 
 class InputExample(object):
   """A single training/test example for simple sequence classification."""
