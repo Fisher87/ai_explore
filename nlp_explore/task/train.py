@@ -90,7 +90,7 @@ class Train(TrainBaseFrame):
             y_batch = _y_batch
 
         if is_training:
-            if not label_batch:
+            if label_batch is None:
                 feed_dict = {
                         self.model.input_x : x_batch, 
                         self.model.input_y : y_batch,
@@ -105,7 +105,7 @@ class Train(TrainBaseFrame):
                             }
 
         else:
-            if not label_batch:
+            if label_batch is None:
                 feed_dict = {
                         self.model.input_x : x_batch, 
                         self.model.input_y : y_batch,

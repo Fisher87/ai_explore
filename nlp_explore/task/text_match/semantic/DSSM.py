@@ -34,17 +34,18 @@ class DSSM(object):
     def dropout(self, x):
         return tf.nn.dropout(x, keep_prob=self.dropout_keep_prob)
 
-    def fc(self, x):
+    def fc(self, x, scope):
         """
         fully connect layer
         """
-        hidden_units = [256, 512, 128]
-        for h_u in hidden_units:
-            x = tf.layers.dense(x, h_u, activation="tanh")
-            x = self.dropout(x)
+        with tf.variable_scope(scope):
+            hidden_units = [256, 512, 128]
+            for h_u in hidden_units:
+                x = tf.layers.dense(x, h_u, activation="tanh")
+                x = self.dropout(x)
 
-        # prepare for compute cosine similarity.
-        x = tf.reshape(x, shape=[-1, x.shape[1]*x.shape[2]])
+            # prepare for compute cosine similarity.
+            x = tf.reshape(x, shape=[-1, x.shape[1]*x.shape[2]])
 
         return x
 
@@ -84,11 +85,11 @@ class DSSM(object):
             self.d_embedding = tf.nn.embedding_lookup(self.embedding_table, self.input_y)
 
         # feature extract layer. DSSM using 3 fc layers.
-        with tf.name_scope("fc_layer"):
-            q_context_rep = self.fc(self.q_embedding)
-            d_context_rep = self.fc(self.d_embedding)
+        q_context_rep = self.fc(self.q_embedding, "fc_x")
+        d_context_rep = self.fc(self.d_embedding, "fc_y")
 
             # refer https://github.com/terrifyzhao/text_matching/blob/master/dssm/graph.py
+        with tf.name_scope("cosine"):
             pos_result = self.cosine(q_context_rep, d_context_rep)
             neg_result = 1 - pos_result
             self.logits = tf.concat([pos_result, neg_result], axis=1)
