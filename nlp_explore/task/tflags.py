@@ -13,16 +13,21 @@
 import tensorflow as tf
 
 data_fpath = "./data/%s/data.csv"
+eval_data_fpath = "./data/%s/eval.csv"
+eval_out_fpath  = './data/%s/eval_out.csv'
 vocab_fpath = "./data/vocab.txt"
 metadata_fpath = ""
 out_dir = "./result/%s"
 
 class TFlags(object):
-    def __init__(self, task, model):
+    def __init__(self, task, model, mode):
         # system flags
         tf.flags.DEFINE_string("task", task, "task name")
         tf.flags.DEFINE_string("model", model, "model name")
+        tf.flags.DEFINE_string("mode", mode, "process mode, train or eval.")
         tf.flags.DEFINE_string("data_path", data_fpath %(task), "data source file path.")
+        tf.flags.DEFINE_string("eval_data_path", eval_data_fpath %(task), "eval data source file path")
+        tf.flags.DEFINE_string("eval_out_path", eval_out_fpath%(task), "eval result output file path")
         tf.flags.DEFINE_string("vocab_path", vocab_fpath, "vocab data source file path.")
         tf.flags.DEFINE_string("metadata_path", metadata_fpath, "metadata file for embedding visualization"
                                                         "(each line is a word segment in metadata_file).")
@@ -77,6 +82,14 @@ class TFlags(object):
 
         elif task=='text_match':
             if model == 'dssm':
+                tf.flags.DEFINE_integer("seq_len", 20, "padding seq length of data.")
+                tf.flags.DEFINE_integer("embedding_dim", 100, "deminsionality of embedding size. (default: 128)")
+                tf.flags.DEFINE_integer("hidden_size", 128, "lstm hidden layer units. (default: 128)")
+                tf.flags.DEFINE_float("learning_rate", 0.0005, "the learning rate. (default: 0.001)")
+                tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "dropout keep probability (default: 0.5)")
+                tf.flags.DEFINE_integer("num_classes", 2, "number of labels (depends on the task.)")
+
+            if model == "esim":
                 tf.flags.DEFINE_integer("seq_len", 20, "padding seq length of data.")
                 tf.flags.DEFINE_integer("embedding_dim", 100, "deminsionality of embedding size. (default: 128)")
                 tf.flags.DEFINE_integer("hidden_size", 128, "lstm hidden layer units. (default: 128)")

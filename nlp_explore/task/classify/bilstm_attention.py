@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 #================================================================
-#   Copyright (C) 2020 TuYa.NLP. All rights reserved.
+#   Copyright (C) 2020 Fisher. All rights reserved.
 #   
 #   文件名称：bilstm_attention.py
 #   创 建 者：YuLianghua
