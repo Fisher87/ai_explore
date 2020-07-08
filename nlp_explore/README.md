@@ -25,6 +25,9 @@
 
 [3.Query 理解和语义召回在知乎搜索中的应用](https://www.6aiq.com/article/1577969687897)
 
+#### 主题抽取
+[1.pLSA模型解析](https://www.cnblogs.com/Determined22/p/7237111.html)
+
 #### 文本匹配
 
 #### 问答系统
