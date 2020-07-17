@@ -18,15 +18,20 @@
 #### 预训练模型
 [1.NLP预训练语言模型总结](https://zhuanlan.zhihu.com/p/76912493)
 
-#### query分析
+#### Query分析
 [1.搜索中的 Query 理解及应用](https://mp.weixin.qq.com/s/TlzgztCcPdzwqrjCUrPRYw)
 
 [2.搜索中的Query扩展技术](https://mp.weixin.qq.com/s/WRVwKaWvY-j-bkjxCprckQ)
 
 [3.Query 理解和语义召回在知乎搜索中的应用](https://www.6aiq.com/article/1577969687897)
 
+#### Query纠错
+[1.Query纠错算法](https://zhuanlan.zhihu.com/p/145198390?utm_source=wechat_session&utm_medium=social&utm_oi=642330513952739328)
+
 #### 主题抽取
 [1.pLSA模型解析](https://www.cnblogs.com/Determined22/p/7237111.html)
+
+[2.通俗理解LDA主题模型](https://cloud.tencent.com/developer/article/1058777)
 
 #### 文本匹配
 
