@@ -24,15 +24,17 @@
 
 #### [常用nlp任务](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task)
 + [文本分类(classify)](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/classify)
+    + TextCNN
+    + Bilstm_Att
 + [实体识别(ner)](http://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/ner)
+    + HMM
+    + CRF
+    + Bilstm_CRF
 + [文本匹配(text_match)](http://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/text_match):
   + [文本相关算法](http://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/text_match/lexical):
     + BM25
     + LSI
-    + TFIDF
-  + [文本分类](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/classify)
-    + TextCNN
-    + Bilstm_Att
+    + TFIDF  
   + [语义相关算法](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/text_match/semantic):
     + DSSM
     + ABCNN
@@ -42,11 +44,8 @@
     + DIIN
     + DRCN
     + BERT_Match
-  + [NER](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/ner)
-    + HMM
-    + CRF
-    + Bilstm_CRF
-  + [ChatBot](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/chatbot)
+  
+ + [ChatBot](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/chatbot)
     + Seq2Seq_Att
 
 ---
