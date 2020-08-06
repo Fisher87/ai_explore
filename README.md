@@ -30,6 +30,9 @@
     + BM25
     + LSI
     + TFIDF
+  + [文本分类](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/classify)
+    + TextCNN
+    + Bilstm_Att
   + [语义相关算法](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/text_match/semantic):
     + DSSM
     + ABCNN
@@ -38,6 +41,12 @@
     + BIMPM
     + DIIN
     + DRCN
+  + [NER](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/ner)
+    + HMM
+    + CRF
+    + BILSTM_CRF
+  + [ChatBot](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/chatbot)
+    + Seq2Seq_Att
 
 ---
 
