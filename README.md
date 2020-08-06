@@ -15,6 +15,9 @@
 ###### 常用算法
 + [viterbi解码算法](https://github.com/Fisher87/ai_explore/blob/master/ml_explore/machineLearning/supervised/viterbi.py)
 
+###### 源码阅读
++ [Xgboost源码阅读笔记](https://github.com/Fisher87/ai_explore/blob/master/ml_explore/reading_code/xgboost%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0.md)
+
 ##### [无监督模型](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/machineLearning/unsupervised)
 + EM算法
 
