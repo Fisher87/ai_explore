@@ -41,10 +41,11 @@
     + BIMPM
     + DIIN
     + DRCN
+    + BERT_Match
   + [NER](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/ner)
     + HMM
     + CRF
-    + BILSTM_CRF
+    + Bilstm_CRF
   + [ChatBot](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/chatbot)
     + Seq2Seq_Att
 
