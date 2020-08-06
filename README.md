@@ -7,6 +7,16 @@
 ## [机器学习](https://github.com/Fisher87/ai_explore/tree/master/ml_explore)
 
 ##### [machine learning](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/machineLearning)
+###### [有监督模型](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/machineLearning/supervised)
++ [decision_tree](https://github.com/Fisher87/ai_explore/blob/master/ml_explore/machineLearning/supervised/decision_tree.py)
++ [gbdt](https://github.com/Fisher87/ai_explore/blob/master/ml_explore/machineLearning/supervised/gbdt.py)
++ [lr](https://github.com/Fisher87/ai_explore/blob/master/ml_explore/machineLearning/supervised/ls.py)
++ [hmm/crf](https://github.com/Fisher87/ai_explore/blob/master/ml_explore/machineLearning/supervised/hmm.py)
+###### 常用算法
++ [viterbi解码算法](https://github.com/Fisher87/ai_explore/blob/master/ml_explore/machineLearning/supervised/viterbi.py)
+
+###### [无监督模型](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/machineLearning/unsupervised)
++ EM算法
 
 ##### [deep learning](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/deepLearning)
 
