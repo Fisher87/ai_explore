@@ -4,7 +4,7 @@
 ========
 > 包含机器学习、深度学习基础知识. 推荐系统及nlp相关算法;
 
-## [机器学习](https://github.com/Fisher87/ai_explore/tree/master/ml_explore)
+## [机器学习相关](https://github.com/Fisher87/ai_explore/tree/master/ml_explore)
 
 #### [machine learning](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/machineLearning)
 ##### [有监督模型](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/machineLearning/supervised)
