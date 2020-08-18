@@ -4,11 +4,24 @@
 ========
 > 包含机器学习、深度学习基础知识. 推荐系统及nlp相关算法;
 
-## [机器学习](https://github.com/Fisher87/ai_explore/tree/master/ml_explore)
+## [机器学习相关](https://github.com/Fisher87/ai_explore/tree/master/ml_explore)
 
-##### [machine learning](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/machineLearning)
+#### [machine learning](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/machineLearning)
+##### [有监督模型](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/machineLearning/supervised)
++ [decision_tree](https://github.com/Fisher87/ai_explore/blob/master/ml_explore/machineLearning/supervised/decision_tree.py)
++ [gbdt](https://github.com/Fisher87/ai_explore/blob/master/ml_explore/machineLearning/supervised/gbdt.py)
++ [lr](https://github.com/Fisher87/ai_explore/blob/master/ml_explore/machineLearning/supervised/ls.py)
++ [hmm/crf](https://github.com/Fisher87/ai_explore/blob/master/ml_explore/machineLearning/supervised/hmm.py)
+###### 常用算法
++ [viterbi解码算法](https://github.com/Fisher87/ai_explore/blob/master/ml_explore/machineLearning/supervised/viterbi.py)
 
-##### [deep learning](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/deepLearning)
+###### 源码阅读
++ [Xgboost源码阅读笔记](https://github.com/Fisher87/ai_explore/blob/master/ml_explore/reading_code/xgboost%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0.md)
+
+##### [无监督模型](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/machineLearning/unsupervised)
++ EM算法
+
+#### [deep learning](https://github.com/Fisher87/ai_explore/tree/master/ml_explore/deepLearning)
 
 ---
 
@@ -24,12 +37,17 @@
 
 #### [常用nlp任务](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task)
 + [文本分类(classify)](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/classify)
+    + TextCNN
+    + Bilstm_Att
 + [实体识别(ner)](http://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/ner)
+    + HMM
+    + CRF
+    + Bilstm_CRF
 + [文本匹配(text_match)](http://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/text_match):
   + [文本相关算法](http://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/text_match/lexical):
     + BM25
     + LSI
-    + TFIDF
+    + TFIDF  
   + [语义相关算法](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/text_match/semantic):
     + DSSM
     + ABCNN
@@ -38,6 +56,10 @@
     + BIMPM
     + DIIN
     + DRCN
+    + BERT_Match
+  
+ + [ChatBot](https://github.com/Fisher87/ai_explore/tree/master/nlp_explore/task/chatbot)
+    + Seq2Seq_Att
 
 ---
 
