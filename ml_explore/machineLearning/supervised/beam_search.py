@@ -4,12 +4,12 @@
 #   Copyright (C) 2020 Fisher. All rights reserved.
 #   
 #   文件名称：beam_search.py
-#   创 建 者：YuLianghua
-#   创建日期：2020年08月10日
+#   创 建 者：Yulianghua
+#   创建日期：2020年08月01日
 #   描    述：
 #
 #================================================================
-
+import numpy as np
 
 def beam_search():
     k_prev_words = torch.full((k, 1), SOS_TOKEN, dtype=torch.long) # (k, 1)
