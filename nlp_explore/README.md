@@ -42,3 +42,6 @@
 [1.知识图谱的技术与应用](https://zhuanlan.zhihu.com/p/38056557)
 
 [2.知识图谱实体链接](https://mp.weixin.qq.com/s/vtj1HgDC2slsOw9DGoURCA)
+
+#### Attention
+[1.深度学习中Attention机制原理](https://zhuanlan.zhihu.com/p/31547842)
