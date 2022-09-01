@@ -192,3 +192,6 @@ class Builder {
      }
    }
 ```
+
+#### 参考博客:
+1.[xgboost源码之Registry](https://datavalley.github.io/2017/09/18/xgboost%E6%BA%90%E7%A0%81%E4%B9%8BRegistry)
